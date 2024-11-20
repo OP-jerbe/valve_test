@@ -80,25 +80,25 @@ class MainWindow(QMainWindow):
         g_left_title_layout = QGridLayout()
         g_left_title_layout.addWidget(self.left_title_label, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
 
-        v_left_labels = QVBoxLayout()
-        v_left_labels.addWidget(self.serial_number_label)
-        v_left_labels.addWidget(self.rework_letter_label)
-        v_left_labels.addWidget(self.base_pressure_label)
-        v_left_inputs = QVBoxLayout()
-        v_left_inputs.addWidget(self.serial_number_input)
-        v_left_inputs.addWidget(self.rework_letter_input)
-        v_left_inputs.addWidget(self.base_pressure_input)
-        h_left_labels_and_inputs = QHBoxLayout()
-        h_left_labels_and_inputs.addLayout(v_left_labels)
-        h_left_labels_and_inputs.addLayout(v_left_inputs)
+        v_left_labels_layout = QVBoxLayout()
+        v_left_labels_layout.addWidget(self.serial_number_label)
+        v_left_labels_layout.addWidget(self.rework_letter_label)
+        v_left_labels_layout.addWidget(self.base_pressure_label)
+        v_left_inputs_layout = QVBoxLayout()
+        v_left_inputs_layout.addWidget(self.serial_number_input)
+        v_left_inputs_layout.addWidget(self.rework_letter_input)
+        v_left_inputs_layout.addWidget(self.base_pressure_input)
+        h_left_labels_and_inputs_layout = QHBoxLayout()
+        h_left_labels_and_inputs_layout.addLayout(v_left_labels_layout)
+        h_left_labels_and_inputs_layout.addLayout(v_left_inputs_layout)
 
         g_start_button_layout = QGridLayout()
         g_start_button_layout.addWidget(self.start_test_button, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        g_left_sub_main = QGridLayout()
-        g_left_sub_main.addLayout(g_left_title_layout, 0, 0)
-        g_left_sub_main.addLayout(h_left_labels_and_inputs, 1, 0)
-        g_left_sub_main.addLayout(g_start_button_layout, 2, 0)
+        g_left_sub_main_layout = QGridLayout()
+        g_left_sub_main_layout.addLayout(g_left_title_layout, 0, 0)
+        g_left_sub_main_layout.addLayout(h_left_labels_and_inputs_layout, 1, 0)
+        g_left_sub_main_layout.addLayout(g_start_button_layout, 2, 0)
 
         # Create a vertical line
         vertical_line = QFrame()
@@ -109,39 +109,37 @@ class MainWindow(QMainWindow):
         g_right_title_layout.addWidget(self.right_title_label, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
         g_right_title_layout.setContentsMargins(0, 0, 0, 35)
 
-        g_right_buttons = QGridLayout()
-        g_right_buttons.addWidget(self.open_button, 0, 0, alignment=Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        g_right_buttons.addWidget(self.close_button, 0, 1, alignment=Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignLeft)
-        g_right_buttons.addWidget(self.home_button, 1, 0, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
-        g_right_buttons.addWidget(self.set_zero_button, 1, 1, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+        g_right_buttons_layout = QGridLayout()
+        g_right_buttons_layout.addWidget(self.open_button, 0, 0, alignment=Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
+        g_right_buttons_layout.addWidget(self.close_button, 0, 1, alignment=Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignLeft)
+        g_right_buttons_layout.addWidget(self.home_button, 1, 0, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
+        g_right_buttons_layout.addWidget(self.set_zero_button, 1, 1, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-        h_right_position = QHBoxLayout()
-        h_right_position.addWidget(self.actual_position_label, alignment=Qt.AlignmentFlag.AlignRight)
-        h_right_position.addWidget(self.actual_position_reading, alignment=Qt.AlignmentFlag.AlignLeft)
-        v_right_goto = QVBoxLayout()
-        v_right_goto.addWidget(self.go_to_position_input, alignment=Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom)
-        v_right_goto.addWidget(self.go_to_position_button, alignment=Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+        h_right_position_layout = QHBoxLayout()
+        h_right_position_layout.addWidget(self.actual_position_label, alignment=Qt.AlignmentFlag.AlignRight)
+        h_right_position_layout.addWidget(self.actual_position_reading, alignment=Qt.AlignmentFlag.AlignLeft)
+        v_right_goto_layout = QVBoxLayout()
+        v_right_goto_layout.addWidget(self.go_to_position_input, alignment=Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom)
+        v_right_goto_layout.addWidget(self.go_to_position_button, alignment=Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
 
-        v_right_pos_and_goto = QVBoxLayout()
-        v_right_pos_and_goto.addLayout(h_right_position)
-        v_right_pos_and_goto.addLayout(v_right_goto)
+        v_right_pos_and_goto_layout = QVBoxLayout()
+        v_right_pos_and_goto_layout.addLayout(h_right_position_layout)
+        v_right_pos_and_goto_layout.addLayout(v_right_goto_layout)
 
-        g_right_sub_main = QGridLayout()
-        g_right_sub_main.addLayout(g_right_title_layout, 0, 0)
-        g_right_sub_main.addLayout(g_right_buttons, 1, 0)
-        g_right_sub_main.addLayout(v_right_pos_and_goto, 2, 0)
+        g_right_sub_main_layout = QGridLayout()
+        g_right_sub_main_layout.addLayout(g_right_title_layout, 0, 0)
+        g_right_sub_main_layout.addLayout(g_right_buttons_layout, 1, 0)
+        g_right_sub_main_layout.addLayout(v_right_pos_and_goto_layout, 2, 0)
 
-        h_main = QHBoxLayout()
-        h_main.addLayout(g_left_sub_main)
-        h_main.addWidget(vertical_line)
-        h_main.addLayout(g_right_sub_main)
+        h_main_layout = QHBoxLayout()
+        h_main_layout.addLayout(g_left_sub_main_layout)
+        h_main_layout.addWidget(vertical_line)
+        h_main_layout.addLayout(g_right_sub_main_layout)
 
         container = QWidget()
-        container.setLayout(h_main)
+        container.setLayout(h_main_layout)
 
         self.setCentralWidget(container)
-
-
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if isinstance(event, QMouseEvent) and event.type() == QEvent.Type.MouseButtonPress:
@@ -150,18 +148,7 @@ class MainWindow(QMainWindow):
                 focused_widget.clearFocus()
         return super().eventFilter(watched, event)
 
-"""Main Window"""
-# valve serial number input 
-# base pressure input
-# button to start motor routine
-# button to open up manual control of motor 
 
-"""Manual Motor Control Window"""
-# Open button (hold button down and open or just a jog command?)
-# Close button (hold button down and close or just a jog command?)
-# Home button
-# Set position to zero button
-# Go-to position input and button to execute
 
 
 if __name__ == '__main__':
