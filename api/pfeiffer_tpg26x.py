@@ -7,6 +7,7 @@ Vacuum:
 """
 
 import serial
+import time
 
 # Code translations constants
 MEASUREMENT_STATUS = {
@@ -119,7 +120,7 @@ class TPG26x(object):
 
     def _clear_output_buffer(self):
         """Clear the output buffer"""
-        serial.time.sleep(0.1)
+        time.sleep(0.1)
         just_read = 'start value'
         out = ''
         while just_read != '':
