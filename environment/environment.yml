@@ -8,4 +8,5 @@ dependencies:
   - matplotlib
   - numpy
   - pyinstaller
+  - pyside6
   - qt-material
