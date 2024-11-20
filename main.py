@@ -1,6 +1,7 @@
+import sys
 import configparser as cp
 import api.motor as mot
-import gui.gui as gui
+from gui.gui import QApplication, MainWindow
 from api.pfeiffer_tpg26x import TPG261 as tpg
 
 
@@ -20,8 +21,14 @@ def main() -> None:
     config_data = load_ini(ini_file)
     motor_com_port = find_comport(config_data, 'Motor')
     p_gauge_com_port = find_comport(config_data, 'Pressure_Gauge')
+    
     print(f'{motor_com_port = }')
     print(f'{p_gauge_com_port = }')
+
+    app = QApplication([])
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
 
 if __name__ == '__main__':
     main()
