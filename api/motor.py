@@ -6,11 +6,12 @@ class MotorController:
         """
         Initialize the Motor Controller.
         
-        :param port: COM port for the serial connection (e.g., 'COM3').
+        :param port: COM port for the serial connection (e.g., '3' or 3).
+        :type port: str or int
         :param baud_rate: Baud rate for the communication (default is 9600).
         :param address: Motor controller address (default is 1).
         """
-        self.port = port
+        self.port = f'COM{port}'
         self.baud_rate = baud_rate
         self.address = address
         self.serial = serial.Serial(port, baud_rate, timeout=1)
