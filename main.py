@@ -7,10 +7,12 @@ from api.pfeiffer_tpg26x import TPG261 as tpg
 VERSION = '1.0'
 
 class App:
-    def __init__(self):
+    def __init__(self, motor_com_port: int, pressure_gauge_com_port: int):
         self.app = QApplication([])
         self.gui = MainWindow()
         self.gui.setWindowTitle(f'Automated Valve Test v{VERSION}')
+        self.motor_com_port = motor_com_port
+        self.pressure_gauge_com_port = pressure_gauge_com_port
 
 
         self.gui.show()
@@ -24,20 +26,10 @@ def main() -> None:
     ini_file = 'valve_test.ini'
     config_data = load_ini(ini_file)
     motor_com_port = find_comport(config_data, 'Motor')
-    p_gauge_com_port = find_comport(config_data, 'Pressure_Gauge')
-
-    print(f'{motor_com_port = }')
-    print(f'{p_gauge_com_port = }')
-
-    app = QApplication([])
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())
-
-def main2() -> None:
-    app = App()
+    pressure_gauge_com_port = find_comport(config_data, 'Pressure_Gauge')
+    app = App(motor_com_port, pressure_gauge_com_port)
     app.run()
 
 if __name__ == '__main__':
-    main2()
+    main()
 
