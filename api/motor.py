@@ -11,12 +11,13 @@ class MotorController:
         :param baud_rate: Baud rate for the communication (default is 9600).
         :param address: Motor controller address (default is 1).
         """
-        self.port = f'COM{port}'
+        self.port = port
         self.baud_rate = baud_rate
         self.address = address
         self.serial = serial.Serial(port, baud_rate, timeout=1)
         self.start_character = "/"
         self.end_character = "R"
+        self.carriage_return = "\r"
 
     def send_command(self, command):
         """
@@ -25,10 +26,15 @@ class MotorController:
         :param command: Command string without start or end characters.
         :return: Response from the controller.
         """
-        full_command = f"{self.start_character}{self.address}{command}{self.end_character}"
+        full_command = f"{self.start_character}{self.address}{command}{self.end_character}{self.carriage_return}"
         self.serial.write(full_command.encode())
+        print(f'{full_command = }')
         time.sleep(0.1)  # Give the controller some time to respond
-        return self.serial.readline().decode().strip()
+        response = self.serial.readline().decode(errors='ignore').strip()
+        text = str(response)[3:-1]
+        print(f'{response = }')
+        print(f'{text = }')
+        return text
 
     def set_current(self, running_current, holding_current) -> None:
         """
@@ -56,6 +62,7 @@ class MotorController:
         
         :param position: Absolute position in steps.
         """
+        
         self.send_command(f"A{position}")
 
     def move_relative(self, steps) -> None:
@@ -69,13 +76,13 @@ class MotorController:
         else:
             self.send_command(f"D{-steps}")
 
-    def home_motor(self, max_steps=10000) -> None:
+    def home_motor(self) -> None:
         """
-        Home the motor to its zero position using the opto sensor.
+        Command the motor to go to its zero position
         
         :param max_steps: Maximum steps to search for home position.
         """
-        self.send_command(f"Z{max_steps}")
+        self.send_command("A0")
 
     def query_position(self) -> str:
         """

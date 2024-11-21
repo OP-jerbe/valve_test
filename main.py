@@ -1,4 +1,5 @@
 import sys
+import time
 from PySide6.QtCore import QTimer
 from helpers.ini_reader import load_ini, find_comport
 from helpers.manual_motor_control import ContinuousMotorControl as cmc
@@ -14,11 +15,14 @@ class App:
         self.gui = MainWindow()
         self.gui.setWindowTitle(f'Automated Valve Test v{VERSION}')
 
-        self.motor = self.connect_to_motor(motor_com_port, 100, 50)
-        self.pressure_gauge = TPG261(port=pressure_gauge_com_port)
+        self.motor = self.connect_to_motor(motor_com_port, 100, 15, 35000, 10)
+        self.initial_position = self.motor.query_position()
+        self.gui.actual_position_reading.setText(str(self.initial_position))
+        
+        #self.pressure_gauge = TPG261(port=pressure_gauge_com_port)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.move_motor)
+        self.move_timer = QTimer()
+        self.move_timer.timeout.connect(self.move_motor)
 
         self.direction: str | None = None
 
@@ -32,58 +36,52 @@ class App:
 
         self.gui.show()
 
-    def connect_to_motor(self, com_port: str, running_current: int, holding_current: int) -> MotorController:
+    def connect_to_motor(self, com_port: str, running_current: int, holding_current: int, velocity: int, acceleration: int) -> MotorController:
         motor = MotorController(port=com_port)
         motor.set_current(running_current, holding_current)
+        motor.set_velocity_and_acceleration(velocity, acceleration)
         return motor
 
     def home_button_handler(self) -> None:
         self.motor.home_motor()
-        position = self.motor.query_position()
-        self.gui.actual_position_reading.setText(position)
-        # query motor for position and set self.gui.actual_position_reading text to position reading.
     
     def set_zero_button_handler(self) -> None:
         self.motor.set_zero()
-        position = self.motor.query_position()
-        self.gui.actual_position_reading.setText(position)
-        # query motor for position and set self.gui.actual_position_reading text to position reading.
 
     def go_to_position_button_handler(self) -> None:
         target_position = self.gui.go_to_position_input.text()
-        self.motor.move_absolute(target_position)
+        command_position = int(float(target_position) * 51200)
+        self.motor.move_absolute(command_position)
         self.gui.go_to_position_input.clear()
-        # query motor for position and set self.gui.actual_position_reading text to position reading.
-
-    def go_to_position(self, target_position) -> None:
-        # Code for moving the motor to target position goes here
-        self.gui.actual_position_reading.setText(target_position)
-        print(f'Motor went to {target_position}')
 
     def start_clockwise_motor(self) -> None:
         self.direction = 'clockwise'
         print('Motor moving clockwise')
-        self.timer.start(100)
+        self.move_timer.start(100)
 
     def start_counterclockwise_motor(self) -> None:
         self.direction = 'counterclockwise'
         print("Motor moving counterclockwise")
-        self.timer.start(100)
+        self.move_timer.start(100)
     
     def stop_motor(self) -> None:
         print("Motor stopped")
-        self.timer.stop()
+        self.move_timer.stop()
         self.direction = None
 
     def move_motor(self) -> None:
         if self.direction == 'clockwise':
             print("Motor is moving clockwise...")
-            # Insert motor control code to rotate clockwise here
+            self.motor.move_relative(1000)
         elif self.direction == 'counterclockwise':
             print("Motor is moving counterclockwise...")
-            # Insert motor control code to rotate counterclockwise here
+            self.motor.move_relative(-1000)
         else:
             print("No direction set")
+
+    def update_position_reading(self) -> None:
+        position = self.motor.query_position()
+        self.gui.actual_position_reading.setText(position)
 
     def run(self) -> None:
         exit_code: int = self.app.exec()
