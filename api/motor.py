@@ -30,7 +30,7 @@ class MotorController:
         time.sleep(0.1)  # Give the controller some time to respond
         return self.serial.readline().decode().strip()
 
-    def set_current(self, running_current, holding_current):
+    def set_current(self, running_current, holding_current) -> None:
         """
         Set the running and holding current.
         
@@ -40,7 +40,7 @@ class MotorController:
         self.send_command(f"m{running_current}")
         self.send_command(f"h{holding_current}")
 
-    def set_velocity_and_acceleration(self, velocity, acceleration):
+    def set_velocity_and_acceleration(self, velocity, acceleration) -> None:
         """
         Set the velocity and acceleration.
         
@@ -50,7 +50,7 @@ class MotorController:
         self.send_command(f"V{velocity}")
         self.send_command(f"L{acceleration}")
 
-    def move_absolute(self, position):
+    def move_absolute(self, position) -> None:
         """
         Move motor to an absolute position.
         
@@ -58,7 +58,7 @@ class MotorController:
         """
         self.send_command(f"A{position}")
 
-    def move_relative(self, steps):
+    def move_relative(self, steps) -> None:
         """
         Move motor by a relative number of steps.
         
@@ -69,7 +69,7 @@ class MotorController:
         else:
             self.send_command(f"D{-steps}")
 
-    def home_motor(self, max_steps=10000):
+    def home_motor(self, max_steps=10000) -> None:
         """
         Home the motor to its zero position using the opto sensor.
         
@@ -77,13 +77,19 @@ class MotorController:
         """
         self.send_command(f"Z{max_steps}")
 
-    def query_position(self):
+    def query_position(self) -> str:
         """
         Query the current motor position.
         
         :return: Motor position.
         """
         return self.send_command("?0")
+    
+    def set_zero(self) -> None:
+        """
+        Set the current position to zero without moving the motor.
+        """
+        self.send_command('z')
 
     def stop(self):
         """
