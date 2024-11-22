@@ -6,9 +6,10 @@ from PySide6.QtCore import Signal
 
 
 class PositionAcquisition():
-    def __init__(self, motor: MotorController, interval: float | int = 1) -> None:
+    def __init__(self, motor: MotorController, update_callback, interval: float | int = 1) -> None:
         super().__init__()
         self.motor: MotorController = motor
+        self.update_callback = update_callback
         self.interval: float | int = interval
         self.running: bool = False
 
@@ -32,15 +33,14 @@ class PositionAcquisition():
         """
         self.running = False
         if self.acq_thread is not None:
-            print("Stopped threading.\n")
             self.acq_thread.join()
+            print("Stopped threading.\n")
 
     def _run(self) -> None:
         """
         Run the data acquisition loop in the background.
         """
         while self.running:
-            print('Trying to fetch data...\n')
             self._fetch_data()
             time.sleep(self.interval)
 
@@ -52,18 +52,8 @@ class PositionAcquisition():
             return
         
         try:
-            print('Fetching data...\n')
             self.position: str = self.motor.query_position()
-            print(f'Current position = {self.position}\n')
+            self.update_callback(self.position)
         except Exception as e:
             traceback.print_exc()
             print(f'\nError while fetching data: {e}\n')
-
-    def get_position(self) -> str:
-        """
-        Get the latest fetched position.
-
-        :return: A string with the motor position
-        """
-        print("Getting latest position...\n")
-        return self.position
