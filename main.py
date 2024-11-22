@@ -3,7 +3,6 @@ import time
 from PySide6.QtCore import QTimer
 from helpers.position_acquisition import PositionAcquisition
 from helpers.ini_reader import load_ini, find_comport
-from helpers.manual_motor_control import ContinuousMotorControl as cmc
 from api.motor import MotorController
 from gui.gui import QApplication, MainWindow
 from api.pfeiffer_tpg26x import TPG261
@@ -24,11 +23,8 @@ class App:
         self.initial_position: str = self.motor.query_position()
         self.gui.actual_position_reading.setText(str(self.initial_position))
         
-        self.timer = QTimer(self.gui)
-        self.timer.timeout.connect(self.update_display)
-        self.refresh_rate = 500
-        self.timer.start(self.refresh_rate)
-        self.position_acquisition = PositionAcquisition(self.motor, self.refresh_rate / 1000)
+        self.interval = 1000
+        self.position_acquisition = PositionAcquisition(self.motor, self.gui.update_valve_position, self.interval / 1000)
         self.position_acquisition.start()
 
         #self.pressure_gauge = TPG261(port=pressure_gauge_com_port)
@@ -57,11 +53,6 @@ class App:
 
         return motor
 
-    def update_display(self) -> None:
-        position = self.position_acquisition.get_position()
-        print(f'update display position = {position}\n')
-        self.gui.actual_position_reading.setText(position)
-
     def home_button_handler(self) -> None:
         self.motor.home_motor()
     
@@ -86,7 +77,16 @@ class App:
         self.motor.move_absolute(command_position)
         self.gui.go_to_position_input.clear()
 
+    def cleanup(self) -> None:
+        """
+        Ensure the thread stops gracefully when the application closes.
+        """
+        self.position_acquisition.stop()
+        self.motor.close()
+        time.sleep(0.5)
+    
     def run(self) -> None:
+        self.app.aboutToQuit.connect(self.cleanup)
         exit_code: int = self.app.exec()
         sys.exit(exit_code)
 
@@ -98,6 +98,7 @@ def main() -> None:
     pressure_gauge_com_port = find_comport(config_data, 'Pressure_Gauge')
     app = App(motor_com_port, pressure_gauge_com_port)
     app.run()
+    
 
 if __name__ == '__main__':
     main()

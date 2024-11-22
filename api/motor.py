@@ -27,8 +27,8 @@ class MotorController:
         :return: Response from the controller.
         """
         full_command = f"{self.start_character}{self.address}{command}{self.end_character}{self.carriage_return}"
-        self.serial.write(full_command.encode())
         print(f'{full_command = }')
+        self.serial.write(full_command.encode())
         time.sleep(0.1)  # Give the controller some time to respond
         raw_response = self.serial.readline()
         decoded_response = raw_response.decode(errors='ignore').strip()
