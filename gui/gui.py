@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtCore import QEvent, Qt, QObject, QRegularExpression
+from PySide6.QtCore import QEvent, Qt, QObject, QThread, QRegularExpression
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget,
     QPushButton, QLabel, QLineEdit, QMessageBox, 
@@ -147,7 +147,16 @@ class MainWindow(QMainWindow):
             if focused_widget is not None:
                 focused_widget.clearFocus()
         return super().eventFilter(watched, event)
-
+    
+    # def closeEvent(self, event) -> None:
+    #     # Confirm the user wants to exit the application.
+    #     reply = QMessageBox.question(self, 'Confirmation',
+    #                                  'Are you sure you want to close the window?',
+    #                                  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
+    #     if reply == QMessageBox.StandardButton.Yes:
+    #         event.accept()
+    #     else:
+    #         event.ignore()
 
 
 
