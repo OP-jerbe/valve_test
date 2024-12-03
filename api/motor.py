@@ -37,7 +37,7 @@ class MotorController:
                 pass
         except Exception as e:
             print(f'Could not decode reponse.\nError: {e}')
-            return ''
+        return ''
 
     def send_command(self, command):
         """
