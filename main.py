@@ -1,6 +1,5 @@
 import sys
 import time
-from PySide6.QtCore import QTimer
 from helpers.position_acquisition import PositionAcquisition
 from helpers.ini_reader import load_ini, find_comport
 from api.motor import MotorController
@@ -39,7 +38,7 @@ class App:
 
     def _valve_position_thread(self, stop_point: int) -> None:
         interval: int = 500
-        self.position_acquisition = PositionAcquisition(self.motor, self.gui.update_valve_position, interval / 1000)
+        self.position_acquisition: PositionAcquisition = PositionAcquisition(self.motor, self.gui.update_valve_position, interval / 1000)
         self.position_acquisition.start()
         while True:
             time.sleep(interval/1000)
@@ -56,7 +55,7 @@ class App:
         acceleration: int = 10000       
         rotation_direction: str = 'normal'
 
-        motor = MotorController(port=com_port)
+        motor: MotorController = MotorController(port=com_port)
         motor.set_current(running_current, holding_current)
         motor.set_velocity_and_acceleration(velocity, acceleration)
         motor.set_rotation_direction(rotation_direction)
@@ -85,21 +84,22 @@ class App:
         self._set_position_text()
 
     def go_to_position_button_handler(self) -> None:
-        target_position = self.gui.go_to_position_input.text()
-        command_position = int(float(target_position) * MICROSTEPS_PER_REV)
+        target_position: str = self.gui.go_to_position_input.text()
+        command_position: int = int(float(target_position) * MICROSTEPS_PER_REV)
         self.gui.go_to_position_input.clear()
         self.motor.move_absolute(command_position)
         self._valve_position_thread(stop_point=command_position)
 
     def cleanup(self) -> None:
         """
-        Ensure the thread stops gracefully when the application closes.
+        Ensure the thread stops and COM port close when the application closes.
         """
         
         if self.position_acquisition.running:
             self.position_acquisition.stop()
-        self.motor.close()
-        time.sleep(0.5)
+        if self.motor:
+            self.motor.close()
+        time.sleep(0.25)
     
     def run(self) -> None:
         self.app.aboutToQuit.connect(self.cleanup)
@@ -108,11 +108,11 @@ class App:
 
 
 def main() -> None:
-    ini_file = 'valve_test.ini'
+    ini_file: str = 'valve_test.ini'
     config_data = load_ini(ini_file)
-    motor_com_port = find_comport(config_data, 'Motor')
-    pressure_gauge_com_port = find_comport(config_data, 'Pressure_Gauge')
-    app = App(motor_com_port, pressure_gauge_com_port)
+    motor_com_port: str = find_comport(config_data, 'Motor')
+    pressure_gauge_com_port: str = find_comport(config_data, 'Pressure_Gauge')
+    app: App = App(motor_com_port, pressure_gauge_com_port)
     app.run()
     
 
