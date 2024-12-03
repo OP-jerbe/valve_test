@@ -3,6 +3,7 @@ import threading
 import time
 from api.motor import MotorController
 from PySide6.QtCore import Signal
+from helpers.constants import MICROSTEPS_PER_REV
 
 
 class PositionAcquisition():
@@ -12,8 +13,6 @@ class PositionAcquisition():
         self.update_callback = update_callback
         self.interval: float | int = interval
         self.running: bool = False
-
-        self.position: str = ''
 
         self.acq_thread: threading.Thread | None = None
 
@@ -52,8 +51,9 @@ class PositionAcquisition():
             return
         
         try:
-            self.position: str = self.motor.query_position()
-            self.update_callback(self.position)
+            motor_position: str = self.motor.query_position()
+            valve_position: float = int(motor_position) / MICROSTEPS_PER_REV
+            self.update_callback(valve_position)
         except Exception as e:
             traceback.print_exc()
             print(f'\nError while fetching data: {e}\n')

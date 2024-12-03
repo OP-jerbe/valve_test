@@ -19,6 +19,26 @@ class MotorController:
         self.end_character = "R"
         self.carriage_return = "\r"
 
+    def _decode_response(self, raw_response: bytes) -> str:
+        decoded_response = raw_response.decode(errors='ignore').strip()
+        print(f'{decoded_response = }')
+        try:
+            try:
+                return decoded_response.split('`')[1][:-1]
+            except:
+                pass
+            try:
+                return decoded_response.split('@')[1][:-1]
+            except:
+                pass
+            try:
+                return decoded_response.split('?')[1][:-1]
+            except:
+                pass
+        except Exception as e:
+            print(f'Could not decode reponse.\nError: {e}')
+            return ''
+
     def send_command(self, command):
         """
         Send a command to the motor controller.
@@ -28,14 +48,16 @@ class MotorController:
         """
         full_command = f"{self.start_character}{self.address}{command}{self.end_character}{self.carriage_return}"
         print(f'{full_command = }')
+
         self.serial.write(full_command.encode())
         time.sleep(0.1)  # Give the controller some time to respond
-        raw_response = self.serial.readline()
-        decoded_response = raw_response.decode(errors='ignore').strip()
-        text = str(decoded_response)[3:-1]
+
+        raw_response: bytes = self.serial.readline()
         print(f'{raw_response = }')
-        print(f'{decoded_response = }')
+
+        text: str = self._decode_response(raw_response)
         print(f'{text = }\n')
+
         return text
 
     def set_current(self, running_current, holding_current) -> None:

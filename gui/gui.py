@@ -141,11 +141,11 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(container)
 
-    def update_valve_position(self, position):
+    def update_valve_position(self, position: float):
         """
         Update the label with the motor's position.
         """
-        self.actual_position_reading.setText(position)
+        self.actual_position_reading.setText(f'{position:.2f}')
     
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if isinstance(event, QMouseEvent) and event.type() == QEvent.Type.MouseButtonPress:
