@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     )
 from PySide6.QtGui import QIcon, QMouseEvent, QRegularExpressionValidator, QAction, QFont
 from qt_material import apply_stylesheet
+from gui.CustomLineEdit import CustomLineEdit
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
@@ -45,17 +46,28 @@ class MainWindow(QMainWindow):
         self.left_title_label = QLabel('Valve Test')
         self.left_title_label.setStyleSheet('font-size: 25px; font-weight: bold; font-family: Arial;')
         self.serial_number_label = QLabel('Serial Number')
-        self.serial_number_input = QLineEdit()
+        self.serial_number_input = CustomLineEdit()
         self.serial_number_input.setFixedSize(input_box_width, input_box_height)
         self.rework_letter_label = QLabel('Rework Letter')
-        self.rework_letter_input = QLineEdit()
+        self.rework_letter_input = CustomLineEdit()
         self.rework_letter_input.setFixedSize(input_box_width, input_box_height)
         self.base_pressure_label = QLabel('Base Pressure')
-        self.base_pressure_input = QLineEdit()
+        self.base_pressure_input = CustomLineEdit()
         self.base_pressure_input.setFixedSize(input_box_width, input_box_height)
         self.start_test_button = QPushButton('Start Test')
         self.start_test_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.start_test_button.setDisabled(True)
+
+        # Set up relationships to activate start button
+        inputs_to_check = [self.serial_number_input, self.rework_letter_input, self.base_pressure_input]
+        self.serial_number_input.inputs_to_check = inputs_to_check
+        self.rework_letter_input.inputs_to_check = inputs_to_check
+        self.base_pressure_input.inputs_to_check = inputs_to_check
+
+        # Set button to activate/deactivate
+        self.serial_number_input.button = self.start_test_button
+        self.rework_letter_input.button = self.start_test_button
+        self.base_pressure_input.button = self.start_test_button
 
         # Create Right Side of Main Window Elements
         self.right_title_label = QLabel('Motor Control')
