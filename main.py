@@ -38,11 +38,12 @@ class App:
     def update_valve_position_until(self, valve_set_point: float) -> None:
         motor_stop_point: int = int(valve_set_point * MICROSTEPS_PER_REV)
         motor_position: int = int(self.motor.query_position())
+        valve_position: float = motor_position / MICROSTEPS_PER_REV
         while motor_position != motor_stop_point:
-            time.sleep(0.5)
+            time.sleep(0.25)
             motor_position: int = int(self.motor.query_position())
             valve_position: float = motor_position / MICROSTEPS_PER_REV
-            self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
+        self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
 
     def connect_to_motor(self, com_port: str) -> MotorController:
         running_current: int = 100
@@ -88,11 +89,8 @@ class App:
 
     def cleanup(self) -> None:
         """
-        Ensure the thread stops and COM port close when the application closes.
+        Ensure the COM ports close when the application closes.
         """
-        
-        if self.position_acquisition.running:
-            self.position_acquisition.stop()
         if self.motor:
             self.motor.close()
         time.sleep(0.25)
