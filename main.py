@@ -32,8 +32,9 @@ class App:
 
     def _set_position_text(self) -> None:
         motor_position: str = self.motor.query_position()
-        valve_position: float = int(motor_position) / MICROSTEPS_PER_REV
-        self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
+        if motor_position != '':
+            valve_position: float = int(motor_position) / MICROSTEPS_PER_REV
+            self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
 
     def update_valve_position_until(self, valve_set_point: float) -> None:
         motor_stop_point: int = int(valve_set_point * MICROSTEPS_PER_REV)
@@ -65,6 +66,7 @@ class App:
     
     def set_zero_button_handler(self) -> None:
         self.motor.set_zero()
+        self.gui.actual_position_reading.setText('0.00')
 
     def open_button_pressed_handler(self) -> None:
         self.motor.move_relative(MAX_VALVE_TURNS * MICROSTEPS_PER_REV)
@@ -81,11 +83,12 @@ class App:
         self._set_position_text()
 
     def go_to_position_button_handler(self) -> None:
-        target_valve_position: float = float(self.gui.go_to_position_input.text())
-        command_position: int = int(target_valve_position * MICROSTEPS_PER_REV)
-        self.gui.go_to_position_input.clear()
-        self.motor.move_absolute(command_position)
-        self.update_valve_position_until(valve_set_point=target_valve_position)
+        if self.gui.go_to_position_input.text() != '':
+            target_valve_position: float = float(self.gui.go_to_position_input.text())
+            command_position: int = int(target_valve_position * MICROSTEPS_PER_REV)
+            self.gui.go_to_position_input.clear()
+            self.motor.move_absolute(command_position)
+            self.update_valve_position_until(valve_set_point=target_valve_position)
 
     def cleanup(self) -> None:
         """

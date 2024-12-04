@@ -34,6 +34,13 @@ class MainWindow(QMainWindow):
         apply_stylesheet(self, theme='dark_lightgreen.xml', invert_secondary=True)
         self.setStyleSheet(self.styleSheet() + """QLineEdit, QTextEdit {color: lightgreen;}""")
 
+        # Create the validator for numerical inputs
+        number_regex = QRegularExpression(r"\d*\.?\d*$")
+        validator = QRegularExpressionValidator(number_regex)
+        # '\d*': Matches zero or more digits
+        # '\.?': Matches an optional decimal point
+        # '\d*$': Matches zero or more digits after the decimal point, until the end of the string
+
         # Create Left Side of Main Window Elements
         self.left_title_label = QLabel('Valve Test')
         self.left_title_label.setStyleSheet('font-size: 25px; font-weight: bold; font-family: Arial;')
@@ -71,6 +78,7 @@ class MainWindow(QMainWindow):
 
         self.go_to_position_input = QLineEdit()
         self.go_to_position_input.setFixedSize(go_to_input_box_width, go_to_input_box_height)
+        self.go_to_position_input.setValidator(validator)
         self.go_to_position_input.setPlaceholderText('Set Postion')
         self.go_to_position_button = QPushButton('Go To Position')
         self.go_to_position_button.setFixedSize(200, button_height)
@@ -141,19 +149,19 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(container)
 
-    def update_valve_position(self, position: float):
-        """
-        Update the label with the motor's position.
-        """
-        self.actual_position_reading.setText(f'{position:.2f}')
-    
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if isinstance(event, QMouseEvent) and event.type() == QEvent.Type.MouseButtonPress:
             focused_widget = QApplication.focusWidget()
             if focused_widget is not None:
                 focused_widget.clearFocus()
         return super().eventFilter(watched, event)
-    
+
+    # def update_valve_position(self, position: float):
+    #     """
+    #     Update the label with the motor's position.
+    #     """
+    #     self.actual_position_reading.setText(f'{position:.2f}')
+        
     # def closeEvent(self, event) -> None:
     #     # Confirm the user wants to exit the application.
     #     reply = QMessageBox.question(self, 'Confirmation',
