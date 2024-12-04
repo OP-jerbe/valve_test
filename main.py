@@ -1,10 +1,11 @@
 import sys
 import time
+from helpers.constants import VERSION, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
 from helpers.ini_reader import load_ini, find_comport
+from helpers.valve_test import ValveTest
 from api.motor import MotorController
 from gui.gui import QApplication, MainWindow
 from api.pfeiffer_tpg26x import TPG261
-from helpers.constants import VERSION, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
 
 
 class App:
@@ -28,6 +29,7 @@ class App:
         self.gui.set_zero_button.clicked.connect(self.set_zero_button_handler)
         self.gui.go_to_position_button.clicked.connect(self.go_to_position_button_handler)
         self.gui.go_to_position_input.returnPressed.connect(self.go_to_position_button_handler)
+        self.gui.start_test_button.pressed.connect(self.start_test_button_handler)
 
         self.gui.show()
 
@@ -90,6 +92,13 @@ class App:
             self.gui.go_to_position_input.clear()
             self.motor.move_absolute(command_position)
             self.update_valve_position_until(valve_set_point=target_valve_position)
+
+    def start_test_button_handler(self) -> None:
+        serial_number = self.gui.serial_number_input.text()
+        rework_letter = self.gui.rework_letter_input.text()
+        base_pressure = self.gui.base_pressure_input.text()
+        valve_test = ValveTest(serial_number, rework_letter, base_pressure)
+        valve_test.run()
 
     def cleanup(self) -> None:
         """
