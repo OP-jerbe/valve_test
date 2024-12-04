@@ -1,11 +1,18 @@
 from PySide6.QtWidgets import QLineEdit, QPushButton
-from PySide6.QtGui import QFocusEvent
+from PySide6.QtGui import QFocusEvent, QKeyEvent
+from PySide6.QtCore import Qt
 
 class CustomLineEdit(QLineEdit):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.inputs_to_check: list = []
         self.button: QPushButton | None = None
+
+    def keyPressEvent(self, arg__1: QKeyEvent) -> None:
+        if arg__1.key() in (Qt.Key_Return, Qt.Key_Enter): # type: ignore
+            self.clearFocus()
+        else:
+            super().keyPressEvent(arg__1)
     
     def focusOutEvent(self, arg__1: QFocusEvent) -> None:
         super().focusOutEvent(arg__1)
