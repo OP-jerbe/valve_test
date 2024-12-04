@@ -19,7 +19,10 @@ class App:
         initial_valve_position: float = initial_motor_position / MICROSTEPS_PER_REV
         self.gui.actual_position_reading.setText(f'{initial_valve_position:.2f}')
 
-        #self.pressure_gauge = TPG261(port=pressure_gauge_com_port)
+        try:
+            self.pressure_gauge = TPG261(port=pressure_gauge_com_port)
+        except:
+            self.pressure_gauge = None
 
         self.gui.open_button.pressed.connect(self.open_button_pressed_handler)
         self.gui.open_button.released.connect(self.open_button_released_handler)
@@ -97,8 +100,10 @@ class App:
         serial_number = self.gui.serial_number_input.text()
         rework_letter = self.gui.rework_letter_input.text()
         base_pressure = self.gui.base_pressure_input.text()
-        valve_test = ValveTest(serial_number, rework_letter, base_pressure)
-        valve_test.run()
+        if self.pressure_gauge:
+            pressure_gauge = self.pressure_gauge
+            valve_test = ValveTest(pressure_gauge, serial_number, rework_letter, base_pressure)
+            valve_test.run()
 
     def cleanup(self) -> None:
         """
