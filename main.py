@@ -27,6 +27,7 @@ class App:
         self.gui.home_button.clicked.connect(self.home_button_handler)
         self.gui.set_zero_button.clicked.connect(self.set_zero_button_handler)
         self.gui.go_to_position_button.clicked.connect(self.go_to_position_button_handler)
+        self.gui.go_to_position_input.returnPressed.connect(self.go_to_position_button_handler)
 
         self.gui.show()
 
