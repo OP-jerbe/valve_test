@@ -1,6 +1,5 @@
 import sys
 import time
-from helpers.position_acquisition import PositionAcquisition
 from helpers.ini_reader import load_ini, find_comport
 from api.motor import MotorController
 from gui.gui import QApplication, MainWindow
@@ -36,17 +35,14 @@ class App:
         valve_position: float = int(motor_position) / MICROSTEPS_PER_REV
         self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
 
-    def _valve_position_thread(self, stop_point: int) -> None:
-        interval: int = 500
-        self.position_acquisition: PositionAcquisition = PositionAcquisition(self.motor, self.gui.update_valve_position, interval / 1000)
-        self.position_acquisition.start()
-        while True:
-            time.sleep(interval/1000)
-            valve_position: float = float(self.gui.actual_position_reading.text())
-            motor_position: int = int(valve_position * MICROSTEPS_PER_REV)
-            if motor_position == stop_point:
-                break
-        self.position_acquisition.stop()
+    def update_valve_position_until(self, valve_set_point: float) -> None:
+        motor_stop_point: int = int(valve_set_point * MICROSTEPS_PER_REV)
+        motor_position: int = int(self.motor.query_position())
+        while motor_position != motor_stop_point:
+            time.sleep(0.5)
+            motor_position: int = int(self.motor.query_position())
+            valve_position: float = motor_position / MICROSTEPS_PER_REV
+            self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
 
     def connect_to_motor(self, com_port: str) -> MotorController:
         running_current: int = 100
@@ -64,7 +60,7 @@ class App:
 
     def home_button_handler(self) -> None:
         self.motor.home_motor()
-        self._valve_position_thread(stop_point=0)
+        self.update_valve_position_until(valve_set_point=0)
     
     def set_zero_button_handler(self) -> None:
         self.motor.set_zero()
@@ -84,11 +80,11 @@ class App:
         self._set_position_text()
 
     def go_to_position_button_handler(self) -> None:
-        target_position: str = self.gui.go_to_position_input.text()
-        command_position: int = int(float(target_position) * MICROSTEPS_PER_REV)
+        target_valve_position: float = float(self.gui.go_to_position_input.text())
+        command_position: int = int(target_valve_position * MICROSTEPS_PER_REV)
         self.gui.go_to_position_input.clear()
         self.motor.move_absolute(command_position)
-        self._valve_position_thread(stop_point=command_position)
+        self.update_valve_position_until(valve_set_point=target_valve_position)
 
     def cleanup(self) -> None:
         """
