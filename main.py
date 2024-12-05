@@ -131,7 +131,7 @@ class App:
         base_pressure = self.gui.base_pressure_input.text()
         self.open_plot_window()
         if self.pressure_gauge:
-            valve_test = ValveTest(serial_number, rework_letter, base_pressure)
+            valve_test = ValveTest(self.pressure_gauge, serial_number, rework_letter, base_pressure)
             valve_test.run()
 
     def cleanup(self) -> None:
