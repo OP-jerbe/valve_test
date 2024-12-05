@@ -1,5 +1,6 @@
 import sys
 import time
+import random
 from helpers.constants import VERSION, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
 from helpers.ini_reader import load_ini, find_comport
 from helpers.valve_test import ValveTest
@@ -7,6 +8,7 @@ from api.motor import MotorController
 from gui.gui import QApplication, MainWindow
 from gui.plot_window import PlotWindow
 from api.pfeiffer_tpg26x import TPG261
+from PySide6.QtCore import QTimer
 
 
 class App:
@@ -38,11 +40,30 @@ class App:
         self.gui.show()
 
     def open_plot_window(self) -> None:
-        """Open the secondary plot window and update its plot."""
-        self.plot_window = PlotWindow(parent=self.gui)
-        # Use external plotting logic to update the plot
-        #self.plot_window.update_plot()
-        self.plot_window.exec()
+            """Open the plot window and simulate pressure data collection."""
+            serial_number = self.gui.serial_number_input.text()
+            rework_letter = self.gui.rework_letter_input.text()
+            base_pressure = self.gui.base_pressure_input.text()
+            parent = self.gui
+            self.plot_window = PlotWindow(serial_number=serial_number, rework_letter=rework_letter, base_pressure=base_pressure, parent=parent)
+            self.plot_window.start_updating()
+
+            # Simulate adding measurements (replace with real data in practice)
+            self.simulate_data_collection()
+            self.plot_window.exec()
+
+    def simulate_data_collection(self) -> None:
+        """Simulate adding data to the plot (replace this with real data acquisition)."""
+        def add_fake_data() -> None:
+            # Generate fake leak valve turns and pressures
+            turn = len(self.plot_window.turns) + 1
+            pressure = random.uniform(1e-7, 1e-5)
+            self.plot_window.add_measurement(turn, pressure)
+
+        # Use a timer to simulate adding data every second
+        self.data_timer = QTimer()
+        self.data_timer.timeout.connect(add_fake_data)
+        self.data_timer.start(1000)  # Add data every second
 
     def _set_position_text(self) -> None:
         motor_position: str = self.motor.query_position()
