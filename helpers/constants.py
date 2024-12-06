@@ -9,8 +9,8 @@ MICROSTEPS_PER_STEP: int = 256
 MICROSTEPS_PER_REV: int = STEPS_PER_REV * MICROSTEPS_PER_STEP
 MAX_VALVE_TURNS: int = 22
 
-STEP_SIZE: float = float(find_constant(config_data, 'STEP_SIZE'))
-VALVE_TEST_TURN_STEP: int = int(0.05 * MICROSTEPS_PER_REV)
+VALVE_STEP_SIZE: float = float(find_constant(config_data, 'VALVE_STEP_SIZE'))
+MOTOR_STEP_SIZE: int = int(VALVE_STEP_SIZE * MICROSTEPS_PER_REV)
 HOLD_TIME: int = int(find_constant(config_data, 'HOLD_TIME')) # the number of seconds to wait for stability
 DRIFT_TOLERANCE: int = int(find_constant(config_data, 'DRIFT_TOLERANCE')) # i.e. 1%  (the maximum percent change between pressure readings when checking for stability)
 
