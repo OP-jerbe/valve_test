@@ -1,4 +1,4 @@
-from ini_reader import load_ini, find_constant
+from helpers.ini_reader import load_ini, find_constant
 
 
 config_data = load_ini('valve_test.ini')
@@ -20,8 +20,3 @@ AOI_UPPER_BOUND: float = float(find_constant(config_data, 'AOI_UPPER_BOUND')) # 
 
 PRESSURE_TURN_POINT: float = float(find_constant(config_data, 'PRESSURE_TURN_POINT')) # Pressure at which the valve should start closing
 
-print(f"{HOLD_TIME = }")
-print(f"{DRIFT_TOLERANCE = }")
-print(f"{AOI_LOWER_BOUND = }")
-print(f"{AOI_UPPER_BOUND = }")
-print(f"{PRESSURE_TURN_POINT = }")
