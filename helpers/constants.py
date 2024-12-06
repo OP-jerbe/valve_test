@@ -12,7 +12,7 @@ MAX_VALVE_TURNS: int = 22
 VALVE_STEP_SIZE: float = float(find_constant(config_data, 'VALVE_STEP_SIZE'))
 MOTOR_STEP_SIZE: int = int(VALVE_STEP_SIZE * MICROSTEPS_PER_REV)
 HOLD_TIME: int = int(find_constant(config_data, 'HOLD_TIME')) # the number of seconds to wait for stability
-DRIFT_TOLERANCE: int = int(find_constant(config_data, 'DRIFT_TOLERANCE')) # i.e. 1%  (the maximum percent change between pressure readings when checking for stability)
+DRIFT_TOLERANCE: int = int(find_constant(config_data, 'DRIFT_TOLERANCE')) # the maximum percent change between pressure readings when checking for stability
 
 # Window that determines if program will wait for stability set by DRIFT_TOLERANCE
 AOI_LOWER_BOUND: float = float(find_constant(config_data, 'AOI_LOWER_BOUND')) # Pressure Area Of Interest Lower Bound

@@ -150,7 +150,7 @@ class MotorController:
         print("Stop Command".upper())
         self.send_command("T")
 
-    def close(self):
+    def close_port(self):
         """
         Close the serial connection.
         """
@@ -171,4 +171,4 @@ if __name__ == "__main__":
         print("Current Position:", motor.query_position())
     finally:
         motor.stop()
-        motor.close()
+        motor.close_port()

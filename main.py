@@ -1,18 +1,18 @@
 import sys
 import time
 import random
+from api.motor import MotorController
+from api.pfeiffer_tpg26x import TPG261
+from gui.gui import QApplication, MainWindow
+from gui.plot_window import PlotWindow
 from helpers.constants import VERSION, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
 from helpers.ini_reader import load_ini, find_comport
 from helpers.valve_test import ValveTest
-from api.motor import MotorController
-from gui.gui import QApplication, MainWindow
-from gui.plot_window import PlotWindow
-from api.pfeiffer_tpg26x import TPG261
 from PySide6.QtCore import QTimer
 
 
 class App:
-    def __init__(self, motor_com_port: str, pressure_gauge_com_port: str):
+    def __init__(self, motor_com_port: str, pressure_gauge_com_port: str) -> None:
         self.app = QApplication([])
         self.gui = MainWindow()
         self.gui.setWindowTitle(f'Automated Valve Test v{VERSION}')
@@ -131,15 +131,19 @@ class App:
         base_pressure = self.gui.base_pressure_input.text()
         self.open_plot_window()
         if self.pressure_gauge:
-            valve_test = ValveTest(self.pressure_gauge, serial_number, rework_letter, base_pressure)
-            valve_test.run()
+            self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure)
+            self.valve_test.run()
 
     def cleanup(self) -> None:
         """
         Ensure the COM ports close when the application closes.
         """
         if self.motor:
-            self.motor.close()
+            self.motor.close_port()
+        if self.pressure_gauge:
+            self.pressure_gauge.close_port()
+        if self.valve_test:
+            self.valve_test.stop()
         time.sleep(0.25)
     
     def run(self) -> None:
