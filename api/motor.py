@@ -33,6 +33,10 @@ class MotorController:
                 pass
             try:
                 return decoded_response.split('?')[1][:-1]
+            except:
+                pass
+            try:
+                return decoded_response.split('c')[1][:-1]
             except Exception as e:
                 print(f'\nCould not decode reponse.\nError: {e}\n')
         except Exception as e:
