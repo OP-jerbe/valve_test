@@ -24,8 +24,10 @@ class App:
 
         try:
             self.pressure_gauge = TPG261(port=pressure_gauge_com_port)
-        except:
+            print("CONNECTED TO GAUGE\n")
+        except Exception as e:
             self.pressure_gauge = None
+            print(f"COULD NOT CONNECT TO PRESSURE GAUGE\nException: {e}\n")
 
         self.gui.open_button.pressed.connect(self.open_button_pressed_handler)
         self.gui.open_button.released.connect(self.open_button_released_handler)
@@ -129,7 +131,7 @@ class App:
         serial_number = self.gui.serial_number_input.text()
         rework_letter = self.gui.rework_letter_input.text()
         base_pressure = self.gui.base_pressure_input.text()
-        self.open_plot_window()
+        #self.open_plot_window()
         if self.pressure_gauge:
             self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure)
             self.valve_test.run()
@@ -142,7 +144,7 @@ class App:
             self.motor.close_port()
         if self.pressure_gauge:
             self.pressure_gauge.close_port()
-        if self.valve_test:
+        if self.valve_test.running:
             self.valve_test.stop()
         time.sleep(0.25)
     
