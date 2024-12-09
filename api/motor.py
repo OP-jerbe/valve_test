@@ -37,6 +37,10 @@ class MotorController:
                 pass
             try:
                 return decoded_response.split('c')[1][:-1]
+            except:
+                pass
+            try:
+                return decoded_response.split('b')[1][:-1]
             except Exception as e:
                 print(f'\nCould not decode reponse.\nError: {e}\n')
         except Exception as e:
@@ -164,13 +168,14 @@ class MotorController:
 # Example usage in main.py:
 if __name__ == "__main__":
     import time
-    motor = MotorController(port="COM4", baud_rate=9600, address=1)
+    motor = MotorController(port="COM3")
     try:
-        motor.set_current(running_current=50, holding_current=20)
-        motor.set_velocity_and_acceleration(velocity=35000, acceleration=10000)
+        motor.set_current(running_current=75, holding_current=15)
+        motor.set_velocity_and_acceleration(velocity=10000, acceleration=2000)
         time.sleep(0.25)
+        motor.set_rotation_direction('reverse')
         motor.move_relative(20000)
-        time.sleep(3)
+        time.sleep(2)
         motor.set_zero()
         print("Current Position:", motor.query_position())
     finally:
