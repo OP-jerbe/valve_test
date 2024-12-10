@@ -99,12 +99,12 @@ class ValveTest:
 
     def _check_if_valve_has_reached_turn_around_point(self) -> None:
         if self._pressure_is_above_PRESSURE_TURN_POINT() and self._valve_is_opening():
-                self._open_valve(MICROSTEPS_PER_REV//4) # open valve one full turn // 4 = quarter turn
+                self._open_valve(MICROSTEPS_PER_REV) # open valve one full turn
                 time.sleep(2.5)
-                self._log_turns_and_pressure(self.pressure, self.valve_position)
+                self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self.direction = 'down'
-                self._log_turns_and_pressure(self.pressure, self.valve_position)
-                self._close_valve(MICROSTEPS_PER_REV//4) # close valve one full turn // 4 = quarter turn
+                self._log_turns_and_pressure(self.valve_position, self.pressure)
+                self._close_valve(MICROSTEPS_PER_REV) # close valve one full turn
                 time.sleep(2.5)
 
     def _check_if_valve_test_needs_to_stop(self) -> None:
