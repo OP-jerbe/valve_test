@@ -1,6 +1,7 @@
 import time
 import csv
 from PySide6.QtCore import QTimer
+from helpers.normalized_data_plotter import NormalizedPlot
 from api.pfeiffer_tpg26x import TPG261
 from api.motor import MotorController
 from helpers.constants import (
@@ -69,13 +70,9 @@ class ValveTest:
         if self._valve_is_opening():
             self.turns_up_log.append(valve_position)
             self.pressure_up_log.append(pressure)
-            # print(f'{self.turns_up_log = }\n')
-            # print(f'{self.pressure_up_log = }\n')
         else:
             self.turns_down_log.append(valve_position)
             self.pressure_down_log.append(pressure)
-            # print(f'{self.turns_down_log = }\n')
-            # print(f'{self.pressure_down_log = }\n')
 
     def _pressure_stable(self, checklist: list[float]) -> bool:
         if len(checklist) < 2:
@@ -102,12 +99,12 @@ class ValveTest:
 
     def _check_if_valve_has_reached_turn_around_point(self) -> None:
         if self._pressure_is_above_PRESSURE_TURN_POINT() and self._valve_is_opening():
-                self._open_valve(MICROSTEPS_PER_REV//4) # open valve one full turn
+                self._open_valve(MICROSTEPS_PER_REV//4) # open valve one full turn // 4 = quarter turn
                 time.sleep(2.5)
                 self._log_turns_and_pressure(self.pressure, self.valve_position)
                 self.direction = 'down'
                 self._log_turns_and_pressure(self.pressure, self.valve_position)
-                self._close_valve(MICROSTEPS_PER_REV//4) # close valve one full turn
+                self._close_valve(MICROSTEPS_PER_REV//4) # close valve one full turn // 4 = quarter turn
                 time.sleep(2.5)
 
     def _check_if_valve_test_needs_to_stop(self) -> None:
@@ -144,6 +141,33 @@ class ValveTest:
             return
         self._wait_for_stability(self.valve_position)
 
+    def _create_csv(self):
+        with open('output.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Turns Up', 'Pressure Up', 'Turns Down', 'Pressure Down'])
+
+            # Make copies of the lists
+            self.turns_up_log_copy: list[float | None] = [num for num in self.turns_up_log]
+            self.pressure_up_log_copy: list[float | None] = [num for num in self.pressure_up_log]
+            self.turns_down_log_copy: list[float | None] = [num for num in self.turns_down_log]
+            self.pressure_down_log_copy: list[float | None] = [num for num in self.pressure_down_log]
+
+            # Ensure all list copys are the same length
+            max_length = max(len(self.turns_up_log_copy), len(self.pressure_up_log_copy), len(self.turns_down_log_copy), len(self.pressure_down_log_copy))
+            self.turns_up_log_copy.extend([None] * (max_length - len(self.turns_up_log)))
+            self.pressure_up_log_copy.extend([None] * (max_length - len(self.pressure_up_log)))
+            self.turns_down_log_copy.extend([None] * (max_length - len(self.turns_down_log)))
+            self.pressure_down_log_copy.extend([None] * (max_length - len(self.pressure_down_log)))
+
+            for row in zip(self.turns_up_log_copy, self.pressure_up_log_copy, self.turns_down_log_copy, self.pressure_down_log_copy):
+                writer.writerow(row)
+
+        print('CSV file written successfully!')
+
+    def _plot_valve_test(self, turns_up, pressure_up, turns_down, pressure_down) -> None:
+        normalized_plot = NormalizedPlot(self.serial_number, self.rework_letter, self.base_pressure)
+        normalized_plot.plot(turns_up, pressure_up, turns_down, pressure_down)
+
     @staticmethod
     def _percent_change(starting_num: float, ending_num: float) -> float:
         difference: float = ending_num - starting_num
@@ -153,22 +177,16 @@ class ValveTest:
     def run(self) -> None:
         self.running = True
         while self.running:
-            self._check_if_valve_test_needs_to_stop()
             self._check_if_valve_has_reached_turn_around_point()
-            if self._valve_is_closing() and not self.running == False:
+            if self._valve_is_closing():
                 self._close_by_STEP_SIZE_and_wait_for_stability()
             if self._valve_is_opening():
                 self._open_by_STEP_SIZE_and_wait_for_stability()
-
+            self._check_if_valve_test_needs_to_stop()
 
     def stop(self) -> None:
         self.running = False
         if int(self.motor.query_position()) != 0:
             self.motor.home_motor()
-        with open('output.csv', mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(['Turns Up', 'Pressure Up', 'Turns Down', 'Pressure Down'])
-
-            for row in zip(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log):
-                writer.writerow(row)
-        print('CSV file written successfully!')
+        self._create_csv()
+        self._plot_valve_test(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
