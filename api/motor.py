@@ -170,11 +170,12 @@ if __name__ == "__main__":
     import time
     motor = MotorController(port="COM3")
     try:
-        motor.set_current(running_current=75, holding_current=15)
+        motor.set_current(running_current=50, holding_current=15)
         motor.set_velocity_and_acceleration(velocity=10000, acceleration=2000)
         time.sleep(0.25)
-        motor.set_rotation_direction('reverse')
-        motor.move_relative(20000)
+        #motor.set_rotation_direction('normal') # open the valve
+        motor.set_rotation_direction('reverse') # close the valve
+        motor.move_relative(256*200//4)
         time.sleep(2)
         motor.set_zero()
         print("Current Position:", motor.query_position())
