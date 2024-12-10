@@ -35,19 +35,15 @@ class NormalizedPlot:
         self.normalized_y_up = self.y_up - self.base_pressure
         self.normalized_y_down = self.y_down - self.base_pressure
 
-        marker = 'o'
-        markersize = 2
-        up_color = 'tab:blue'
-        down_color = 'lightskyblue'
-        self.ax.plot(self.x_up, self.normalized_y_up, label='Opening', color=up_color, marker=marker, markersize=markersize)
-        self.ax.plot(self.x_down, self.normalized_y_down, label='Closing', color=down_color, marker=marker, markersize=markersize)
+        self.ax.plot(self.x_up, self.normalized_y_up, label='Opening', color='tab:blue', marker='o', markersize=2)
+        self.ax.plot(self.x_down, self.normalized_y_down, label='Closing', color='lightskyblue', marker='o', markersize=2)
         self.ax.legend(fontsize=5)
         self.fig.tight_layout()
-        # self.fig.savefig(f'{self.serial_number}{self.rework_letter} Normalized Pressure vs Turns')
+        self.fig.savefig(f'{self.serial_number}{self.rework_letter} Normalized Pressure vs Turns')
         plt.show()
 
 
-def _main() -> None:
+def main() -> None:
     valve_serial_number: str = '247'
     rework_letter: str = 'C'
     base_pressure: str = '1e-7'
@@ -59,4 +55,4 @@ def _main() -> None:
     plot.plot(x_up, y_up, x_down, y_down) 
 
 if __name__ == '__main__':
-    _main()
+    main()
