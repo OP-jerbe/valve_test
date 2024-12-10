@@ -1,5 +1,7 @@
-from helpers.ini_reader import load_ini, find_constant
-
+try:
+    from helpers.ini_reader import load_ini, find_constant
+except:
+    from ini_reader import load_ini, find_constant
 
 config_data = load_ini('valve_test.ini')
 
