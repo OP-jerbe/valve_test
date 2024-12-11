@@ -39,7 +39,7 @@ class NormalizedPlot:
         self.ax.plot(self.x_down, self.normalized_y_down, label='Closing', color='lightskyblue', marker='o', markersize=2)
         self.ax.legend(fontsize=5)
         self.fig.tight_layout()
-        self.fig.savefig(f'results//plot_figures//{self.serial_number}//{self.serial_number}{self.rework_letter} Normalized Pressure vs Turns')
+        self.fig.savefig(f'{self.serial_number}{self.rework_letter} Normalized Pressure vs Turns')
         plt.show()
 
 
