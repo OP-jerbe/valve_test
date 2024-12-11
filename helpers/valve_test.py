@@ -67,8 +67,7 @@ class ValveTest:
 
     def pause(self, seconds: float) -> None:
         loop = QEventLoop()
-        milliseconds: int = int(seconds*1000)
-        QTimer.singleShot(milliseconds, loop.quit)
+        QTimer.singleShot(int(seconds*1000), loop.quit)
         loop.exec()
 
     def _log_turns_and_pressure(self, valve_position: float, pressure: float) -> None:
