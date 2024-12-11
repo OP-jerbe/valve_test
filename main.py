@@ -90,12 +90,12 @@ class App:
         self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
 
     def connect_to_motor(self, com_port: str) -> MotorController:
-        running_current: int = 100
-        holding_current: int = 15
-        velocity: int = 35000
-        acceleration: int = 10000
-        rotation_direction: str = 'normal'
         microstep: int = MICROSTEPS_PER_STEP
+        running_current: int = 100
+        holding_current: int = 2
+        velocity: int = 50
+        acceleration: int = 500
+        rotation_direction: str = 'normal'
 
         motor: MotorController = MotorController(port=com_port)
         motor.set_microsteps_per_step(microstep)
