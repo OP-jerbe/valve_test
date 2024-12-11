@@ -201,16 +201,16 @@ if __name__ == "__main__":
     motor = MotorController(port="COM3")
     try:
         motor.set_current(running_current=100, holding_current=2)
-        motor.set_velocity_and_acceleration(velocity=50, acceleration=500)
+        motor.set_velocity_and_acceleration(velocity=150, acceleration=500)
         motor.set_microsteps_per_step(MICROSTEPS_PER_STEP)
         motor.query_microsteps_per_step()
         time.sleep(0.25)
 
-        #motor.set_rotation_direction('normal') # open the valve
+        motor.set_rotation_direction('normal') # open the valve
         motor.set_rotation_direction('reverse') # close the valve
 
-        motor.move_relative(MICROSTEPS_PER_REV//10)
-        time.sleep(2)
+        motor.move_relative(MICROSTEPS_PER_REV//4)
+        time.sleep(1)
         motor.set_zero()
         print("Current Position:", motor.query_position())
     finally:
