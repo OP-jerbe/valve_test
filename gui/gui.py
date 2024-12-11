@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     )
 from PySide6.QtGui import QIcon, QMouseEvent, QRegularExpressionValidator, QAction, QFont
 from qt_material import apply_stylesheet
-from gui.customLineEdit import CustomLineEdit
+from gui.CustomLineEdit import CustomLineEdit
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
