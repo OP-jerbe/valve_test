@@ -40,6 +40,10 @@ class MotorController:
             except:
                 pass
             try:
+                return decoded_response.split('O')[1][:-1]
+            except:
+                pass
+            try:
                 return decoded_response.split('b')[1][:-1]
             except Exception as e:
                 print(f'\nCould not decode reponse.\nError: {e}\n')
@@ -192,17 +196,20 @@ if __name__ == "__main__":
     import sys
     import os
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'helpers')))
-    from constants import MICROSTEPS_PER_STEP # type: ignore
+    from constants import MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV # type: ignore
 
     motor = MotorController(port="COM3")
     try:
-        motor.set_current(running_current=100, holding_current=15)
-        motor.set_velocity_and_acceleration(velocity=10000, acceleration=2000)
+        motor.set_current(running_current=100, holding_current=2)
+        motor.set_velocity_and_acceleration(velocity=50, acceleration=500)
         motor.set_microsteps_per_step(MICROSTEPS_PER_STEP)
+        motor.query_microsteps_per_step()
         time.sleep(0.25)
+
         #motor.set_rotation_direction('normal') # open the valve
         motor.set_rotation_direction('reverse') # close the valve
-        motor.move_relative(200*MICROSTEPS_PER_STEP//20)
+
+        motor.move_relative(MICROSTEPS_PER_REV//10)
         time.sleep(2)
         motor.set_zero()
         print("Current Position:", motor.query_position())
