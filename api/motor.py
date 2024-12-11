@@ -189,14 +189,20 @@ class MotorController:
 # Example usage in main.py:
 if __name__ == "__main__":
     import time
+    import sys
+    import os
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'helpers')))
+    from constants import MICROSTEPS_PER_STEP # type: ignore
+
     motor = MotorController(port="COM3")
     try:
-        motor.set_current(running_current=50, holding_current=15)
+        motor.set_current(running_current=100, holding_current=15)
         motor.set_velocity_and_acceleration(velocity=10000, acceleration=2000)
+        motor.set_microsteps_per_step(MICROSTEPS_PER_STEP)
         time.sleep(0.25)
         #motor.set_rotation_direction('normal') # open the valve
         motor.set_rotation_direction('reverse') # close the valve
-        motor.move_relative(256*200//4)
+        motor.move_relative(200*MICROSTEPS_PER_STEP//20)
         time.sleep(2)
         motor.set_zero()
         print("Current Position:", motor.query_position())
