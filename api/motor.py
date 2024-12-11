@@ -150,15 +150,36 @@ class MotorController:
         else:
             # raise an exception here
             return
+        
+    def set_microsteps_per_step(self, microsteps_per_step: int = 256) -> None:
+        """
+        Sets the motors microsteps per step
 
-    def stop(self):
+        :param microsteps_per_step: Default is 256. Acceptable values are: 1, 2, 4, 8, 16, 32, 64, 128, 256. 
+        """
+        acceptable_values = (1, 2, 4, 8, 16, 32, 64, 128, 256)
+        if microsteps_per_step not in acceptable_values:
+            raise ValueError(f'{microsteps_per_step} is not an acceptable value. Acceptable values: {acceptable_values}')
+        else:
+            self.send_command(f"j{microsteps_per_step}")
+        
+    def query_microsteps_per_step(self) -> str:
+        """
+        Query the current microsteps_per_step
+
+        :return: microsteps per step setting
+        """
+        print("Query Microstep per Step Command".upper())
+        return self.send_command("?6")
+
+    def stop(self) -> None:
         """
         Stop the current motor operation.
         """
         print("Stop Command".upper())
         self.send_command("T")
 
-    def close_port(self):
+    def close_port(self) -> None:
         """
         Close the serial connection.
         """
