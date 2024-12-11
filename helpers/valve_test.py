@@ -1,6 +1,5 @@
-import time
 import csv
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, QEventLoop
 from helpers.normalized_data_plotter import NormalizedPlot
 from api.pfeiffer_tpg26x import TPG261
 from api.motor import MotorController
@@ -17,7 +16,6 @@ class ValveTest:
         self.rework_letter: str = rework_letter
         self.base_pressure: str = base_pressure
 
-        #self.timer: QTimer = QTimer()
         self.running: bool = False
         self.direction: str = 'up'
         self.pressure: float = float(self.base_pressure)
@@ -67,6 +65,12 @@ class ValveTest:
     def _valve_is_closing(self) -> bool:
         return self.direction == 'down'
 
+    def pause(self, seconds: float) -> None:
+        loop = QEventLoop()
+        milliseconds: int = int(seconds*1000)
+        QTimer.singleShot(milliseconds, loop.quit)
+        loop.exec()
+
     def _log_turns_and_pressure(self, valve_position: float, pressure: float) -> None:
         if self._valve_is_opening():
             self.turns_up_log.append(valve_position)
@@ -92,22 +96,22 @@ class ValveTest:
                 if not self._pressure_stable(checklist) and len(checklist) >= 2:
                     print('Pressure not stable.\n')
                     checklist.clear()
-                    time.sleep(1)
+                    self.pause(1)
                     break
-                time.sleep(1)
+                self.pause(1)
             if self._pressure_stable(checklist):
-                time.sleep(1)
+                self.pause(1)
 
     def _check_if_valve_has_reached_turn_around_point(self) -> None:
         if self._pressure_is_above_PRESSURE_TURN_POINT() and self._valve_is_opening():
                 self._open_valve(MICROSTEPS_PER_REV) # open valve one full turn
-                time.sleep(2.5)
+                self.pause(2.5)
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self.direction = 'down'
-                time.sleep(2.5)
+                self.pause(2.5)
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self._close_valve(MICROSTEPS_PER_REV) # close valve one full turn
-                time.sleep(2.5)
+                self.pause(2.5)
 
     def _check_if_valve_test_needs_to_stop(self) -> None:
         if (self._valve_is_at_zero() or self._pressure_is_below_base_pressure()) and self._valve_is_closing():
@@ -126,7 +130,7 @@ class ValveTest:
         """
         self._open_valve(MOTOR_STEP_SIZE)
         self.valve_position = self._get_valve_position()
-        time.sleep(HOLD_TIME)
+        self.pause(HOLD_TIME)
         self.pressure = self._get_pressure()
         if not self._pressure_is_within_AOI_bounds():
             self._log_turns_and_pressure(self.valve_position, self.pressure)
@@ -136,7 +140,7 @@ class ValveTest:
     def _close_by_STEP_SIZE_and_wait_for_stability(self) -> None:
         self._close_valve(MOTOR_STEP_SIZE)
         self.valve_position = self._get_valve_position()
-        time.sleep(HOLD_TIME)
+        self.pause(HOLD_TIME)
         self.pressure = self._get_pressure()
         if not self._pressure_is_within_AOI_bounds():
             self._log_turns_and_pressure(self.valve_position, self.pressure)
