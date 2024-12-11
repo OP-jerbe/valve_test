@@ -10,7 +10,7 @@ VERSION: str = '1.0'
 
 # Motor control constants
 STEPS_PER_REV: int = 200 # Set by motor design. DO NOT CHANGE!!!
-MICROSTEPS_PER_STEP: int = 256 # acceptable values are: 1, 2, 4, 8, 16, 32, 64, 128, 256
+MICROSTEPS_PER_STEP: int = 1 # acceptable values are: 1, 2, 4, 8, 16, 32, 64, 128, 256 (motor velocity must be set slower, the smaller the microsteps are)
 MICROSTEPS_PER_REV: int = STEPS_PER_REV * MICROSTEPS_PER_STEP
 MAX_VALVE_TURNS: int = 22
 
