@@ -2,7 +2,7 @@ import serial
 import time
 
 class MotorController:
-    def __init__(self, port, baud_rate=9600, address=1):
+    def __init__(self, port, baud_rate=9600, address=1) -> None:
         """
         Initialize the Motor Controller.
         
@@ -47,7 +47,7 @@ class MotorController:
             print(f'\nCould not decode reponse.\nError: {e}\n')
         return ''
 
-    def send_command(self, command):
+    def send_command(self, command) -> str:
         """
         Send a command to the motor controller.
         
