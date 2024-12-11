@@ -5,7 +5,7 @@ from api.motor import MotorController
 from api.pfeiffer_tpg26x import TPG261
 from gui.gui import QApplication, MainWindow
 from gui.plot_window import PlotWindow
-from helpers.constants import VERSION, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
+from helpers.constants import VERSION, MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
 from helpers.ini_reader import load_ini, find_comport
 from helpers.valve_test import ValveTest
 from PySide6.QtCore import QTimer
@@ -17,17 +17,23 @@ class App:
         self.gui = MainWindow()
         self.gui.setWindowTitle(f'Automated Valve Test v{VERSION}')
 
-        self.motor: MotorController = self.connect_to_motor(motor_com_port)
-        initial_motor_position: int = int(self.motor.query_position())
-        initial_valve_position: float = initial_motor_position / MICROSTEPS_PER_REV
-        self.gui.actual_position_reading.setText(f'{initial_valve_position:.2f}')
-
+        try:
+            self.motor: MotorController = self.connect_to_motor(motor_com_port)
+            print("CONNECTED TO MOTOR")
+        except Exception as e:
+            print(f"COULD NOT CONNECT TO MOTOR\nException: {e}")
+            sys.exit()
         try:
             self.pressure_gauge = TPG261(port=pressure_gauge_com_port)
             print("CONNECTED TO GAUGE\n")
         except Exception as e:
             self.pressure_gauge = None
             print(f"COULD NOT CONNECT TO PRESSURE GAUGE\nException: {e}\n")
+        
+        initial_motor_position: int = int(self.motor.query_position())
+        initial_valve_position: float = initial_motor_position / MICROSTEPS_PER_REV
+        self.gui.actual_position_reading.setText(f'{initial_valve_position:.2f}')
+
 
         self.gui.open_button.pressed.connect(self.open_button_pressed_handler)
         self.gui.open_button.released.connect(self.open_button_released_handler)
@@ -87,10 +93,12 @@ class App:
         running_current: int = 100
         holding_current: int = 15
         velocity: int = 35000
-        acceleration: int = 10000       
+        acceleration: int = 10000
         rotation_direction: str = 'normal'
+        microstep: int = MICROSTEPS_PER_STEP
 
         motor: MotorController = MotorController(port=com_port)
+        motor.set_microsteps_per_step(microstep)
         motor.set_current(running_current, holding_current)
         motor.set_velocity_and_acceleration(velocity, acceleration)
         motor.set_rotation_direction(rotation_direction)
