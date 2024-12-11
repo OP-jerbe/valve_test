@@ -142,7 +142,7 @@ class ValveTest:
         self._wait_for_stability(self.valve_position)
 
     def _create_csv(self):
-        with open('output.csv', mode='w', newline='') as file:
+        with open(f'results//csv_files//{self.serial_number}//{self.serial_number}{self.rework_letter}.csv', mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['Turns Up', 'Pressure Up', 'Turns Down', 'Pressure Down'])
 
