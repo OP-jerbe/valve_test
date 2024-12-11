@@ -93,7 +93,7 @@ class App:
         microstep: int = MICROSTEPS_PER_STEP
         running_current: int = 100
         holding_current: int = 2
-        velocity: int = 50
+        velocity: int = 150
         acceleration: int = 500
         rotation_direction: str = 'normal'
 
