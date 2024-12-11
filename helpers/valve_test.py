@@ -1,4 +1,3 @@
-import time
 import csv
 from PySide6.QtCore import QTimer
 from helpers.normalized_data_plotter import NormalizedPlot
@@ -17,6 +16,7 @@ class ValveTest:
         self.rework_letter: str = rework_letter
         self.base_pressure: str = base_pressure
 
+        self.timer: QTimer = QTimer()
         self.running: bool = False
         self.direction: str = 'up'
         self.pressure: float = float(self.base_pressure)
@@ -91,21 +91,22 @@ class ValveTest:
                 if not self._pressure_stable(checklist) and len(checklist) >= 2:
                     print('Pressure not stable.\n')
                     checklist.clear()
-                    time.sleep(1)
+                    self.timer.singleShot(1000, self.timer.stop)
                     break
-                time.sleep(1)
+                self.timer.singleShot(1000, self.timer.stop)
             if self._pressure_stable(checklist):
-                time.sleep(1)
+                self.timer.singleShot(1000, self.timer.stop)
 
     def _check_if_valve_has_reached_turn_around_point(self) -> None:
         if self._pressure_is_above_PRESSURE_TURN_POINT() and self._valve_is_opening():
                 self._open_valve(MICROSTEPS_PER_REV) # open valve one full turn
-                time.sleep(2.5)
+                self.timer.singleShot(2500, self.timer.stop)
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self.direction = 'down'
+                self.timer.singleShot(2500, self.timer.stop)
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self._close_valve(MICROSTEPS_PER_REV) # close valve one full turn
-                time.sleep(2.5)
+                self.timer.singleShot(2500, self.timer.stop)
 
     def _check_if_valve_test_needs_to_stop(self) -> None:
         if (self._valve_is_at_zero() or self._pressure_is_below_base_pressure()) and self._valve_is_closing():
@@ -124,7 +125,7 @@ class ValveTest:
         """
         self._open_valve(MOTOR_STEP_SIZE)
         self.valve_position = self._get_valve_position()
-        time.sleep(HOLD_TIME)
+        self.timer.singleShot(HOLD_TIME, self.timer.stop)
         self.pressure = self._get_pressure()
         if not self._pressure_is_within_AOI_bounds():
             self._log_turns_and_pressure(self.valve_position, self.pressure)
@@ -134,14 +135,14 @@ class ValveTest:
     def _close_by_STEP_SIZE_and_wait_for_stability(self) -> None:
         self._close_valve(MOTOR_STEP_SIZE)
         self.valve_position = self._get_valve_position()
-        time.sleep(HOLD_TIME)
+        self.timer.singleShot(HOLD_TIME, self.timer.stop)
         self.pressure = self._get_pressure()
         if not self._pressure_is_within_AOI_bounds():
             self._log_turns_and_pressure(self.valve_position, self.pressure)
             return
         self._wait_for_stability(self.valve_position)
 
-    def _create_csv(self):
+    def _create_csv(self) -> None:
         with open(f'{self.serial_number}{self.rework_letter}.csv', mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['Turns Up', 'Pressure Up', 'Turns Down', 'Pressure Down'])
