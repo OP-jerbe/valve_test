@@ -225,7 +225,7 @@ if __name__ == "__main__":
     import time
     import sys
     from pathlib import Path
-
+    from PySide6.QtWidgets import QApplication
     current_file = Path(__file__).resolve()
     helpers_dir = current_file.parent.parent / 'helpers'
     sys.path.append(str(helpers_dir))
@@ -236,10 +236,11 @@ if __name__ == "__main__":
         QTimer.singleShot(int(seconds*1000), loop.quit)
         loop.exec()
 
+    QApplication([])
     motor = MotorController(port="COM3")
     try:
         motor.set_current(running_current=100, holding_current=2)
-        motor.set_velocity_and_acceleration(velocity=150, acceleration=500)
+        motor.set_velocity_and_acceleration(velocity=150, acceleration=50)
         motor.set_microsteps_per_step(MICROSTEPS_PER_STEP)
         motor.query_microsteps_per_step()
         pause(0.25)
