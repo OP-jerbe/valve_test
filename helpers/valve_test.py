@@ -57,17 +57,8 @@ class ValveTest:
     def _pressure_is_within_AOI_bounds(self) -> bool:
         return self.pressure > AOI_LOWER_BOUND and self.pressure < AOI_UPPER_BOUND
 
-    def _valve_is_at_zero(self) -> bool:
-        return self._get_valve_position() == 0
-    
-    def _valve_is_opening(self) -> bool:
-        return self.direction == 'up'
-    
-    def _valve_is_closing(self) -> bool:
-        return self.direction == 'down'
-
     def _log_turns_and_pressure(self, valve_position: float, pressure: float) -> None:
-        if self._valve_is_opening():
+        if self.direction == 'up':
             self.turns_up_log.append(valve_position)
             self.pressure_up_log.append(pressure)
         else:
@@ -98,7 +89,7 @@ class ValveTest:
                 self.pause(1)
 
     def _check_if_valve_has_reached_turn_around_point(self) -> None:
-        if self._pressure_is_above_PRESSURE_TURN_POINT() and self._valve_is_opening():
+        if self._pressure_is_above_PRESSURE_TURN_POINT() and self.direction == 'up':
                 self._open_valve(MICROSTEPS_PER_REV) # open valve one full turn
                 self.pause(5)
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
@@ -107,31 +98,25 @@ class ValveTest:
                 self._close_valve(MICROSTEPS_PER_REV) # close valve one full turn
                 self.pause(5)
 
+    def _move_by_STEP_SIZE_and_wait_for_stability(self) -> None:
+        if self.direction == 'up':
+            self._open_valve(MOTOR_STEP_SIZE)
+        else:
+            self._close_valve(MOTOR_STEP_SIZE)
+        self.pause(0.05)
+        self.valve_position = self._get_valve_position()
+        self.pause(HOLD_TIME)
+        self.pressure = self._get_pressure()
+        if not self._pressure_is_within_AOI_bounds():
+            self._log_turns_and_pressure(self.valve_position, self.pressure)
+            return
+        self._wait_for_stability(self.valve_position)
+
     def _check_if_valve_test_needs_to_stop(self) -> None:
-        if (self._valve_is_at_zero() or self._pressure_is_below_base_pressure()) and self._valve_is_closing():
+        if (self._pressure_is_below_base_pressure() or self.valve_position == 0) and self.direction == 'down':
                 self.stop()
                 print('Valve test complete.')
                 # ADD: display a message window that says the valve test is complete.
-
-    def _open_by_STEP_SIZE_and_wait_for_stability(self) -> None:
-        self._open_valve(MOTOR_STEP_SIZE)
-        self.valve_position = self._get_valve_position()
-        self.pause(HOLD_TIME)
-        self.pressure = self._get_pressure()
-        if not self._pressure_is_within_AOI_bounds():
-            self._log_turns_and_pressure(self.valve_position, self.pressure)
-            return
-        self._wait_for_stability(self.valve_position)
-
-    def _close_by_STEP_SIZE_and_wait_for_stability(self) -> None:
-        self._close_valve(MOTOR_STEP_SIZE)
-        self.valve_position = self._get_valve_position()
-        self.pause(HOLD_TIME)
-        self.pressure = self._get_pressure()
-        if not self._pressure_is_within_AOI_bounds():
-            self._log_turns_and_pressure(self.valve_position, self.pressure)
-            return
-        self._wait_for_stability(self.valve_position)
 
     def _create_csv(self) -> None:
         #with open(f'{self.serial_number}{self.rework_letter}.csv', mode='w', newline='') as file:
@@ -157,8 +142,6 @@ class ValveTest:
 
         print('CSV file written successfully!')
 
-    
-
     @staticmethod
     def _percent_change(starting_num: float, ending_num: float) -> float:
         difference: float = ending_num - starting_num
@@ -173,20 +156,17 @@ class ValveTest:
 
     def plot_data(self) -> Figure:
         normalized_plot = NormalizedPlot(self.serial_number, self.rework_letter, self.base_pressure)
-        return normalized_plot.plot(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
+        figure = normalized_plot.plot(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
+        return figure
 
     def run(self) -> None:
         self.running = True
         while self.running:
             self._check_if_valve_has_reached_turn_around_point()
-            if self._valve_is_closing():
-                self._close_by_STEP_SIZE_and_wait_for_stability()
-            if self._valve_is_opening():
-                self._open_by_STEP_SIZE_and_wait_for_stability()
+            self._move_by_STEP_SIZE_and_wait_for_stability()
             self._check_if_valve_test_needs_to_stop()
         self._create_csv()
         
-
     def stop(self) -> None:
         self.running = False
         if int(self.motor.query_position()) != 0:
