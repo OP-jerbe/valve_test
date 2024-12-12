@@ -208,7 +208,7 @@ if __name__ == "__main__":
     motor = MotorController(port="COM3")
     try:
         motor.set_current(running_current=100, holding_current=2)
-        motor.set_velocity_and_acceleration(velocity=10, acceleration=20)
+        motor.set_velocity_and_acceleration(velocity=300, acceleration=150)
         motor.set_microsteps_per_step(MICROSTEPS_PER_STEP)
         motor.query_microsteps_per_step()
         pause(0.25)
