@@ -119,14 +119,6 @@ class ValveTest:
                 # ADD: display a message window that says the valve test is complete.
 
     def _open_by_STEP_SIZE_and_wait_for_stability(self) -> None:
-        """
-        The valve will first open by MOTOR_STEP_SIZE (typical is 1/20th of a turn of the valve) and get the valve position.
-        Then the program waits for HOLD_TIME (typical is 5 seconds) before getting a pressure measurement.
-        If the pressure IS NOT within the pressure area of interest then the valve position and pressure are
-        recorded and the 'while self.running:' loop starts over.
-        If the pressure IS within the pressure area of interest then the program waits for the pressure to stabilize
-        before restarting the 'while self.running:' loop.
-        """
         self._open_valve(MOTOR_STEP_SIZE)
         self.valve_position = self._get_valve_position()
         self.pause(HOLD_TIME)
