@@ -29,16 +29,16 @@ class MotorController:
     def _decode_response(self, raw_response: bytes) -> str:
         """Decode the raw response and extract the relevant part."""
         # Decode and clean up the raw response
-        decoded_response = raw_response.decode(errors='ignore').strip()
+        decoded_response: str = raw_response.decode(errors='ignore').strip()
         print(f'{decoded_response = }')
 
         # Define split characters to try
-        split_chars = ['`', '@', '?', 'c', 'O', 'b']
+        split_chars: tuple[str, ...] = ('`', '@', '?', 'c', 'O', 'b')
 
         # Attempt to split the response using each character
         for char in split_chars:
             try:
-                result = decoded_response.split(char)[1][:-1]
+                result: str = decoded_response.split(char)[1][:-1]
                 return result
             except IndexError:
                 continue  # Move to the next character if split fails
@@ -58,16 +58,12 @@ class MotorController:
         """
         full_command = f"{self.start_character}{self.address}{command}{self.end_character}{self.carriage_return}"
         print(f'{full_command = }')
-
         self.serial.write(full_command.encode())
         self.pause(0.1)  # Give the controller some time to respond
-
         raw_response: bytes = self.serial.readline()
         print(f'{raw_response = }')
-
         text: str = self._decode_response(raw_response)
         print(f'{text = }\n')
-
         return text
 
     def set_current(self, running_current, holding_current) -> None:
