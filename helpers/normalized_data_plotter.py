@@ -27,7 +27,7 @@ class NormalizedPlot:
         self.ax.set_xticks(range(0,13))
         
 
-    def plot(self, x_up: list[float | None], y_up: list[float | None], x_down: list[float | None], y_down: list[float | None]) -> None:
+    def plot(self, x_up: list[float], y_up: list[float], x_down: list[float], y_down: list[float]) -> Figure:
         self.x_up = np.array(x_up)
         self.y_up = np.array(y_up)
         self.x_down = np.array(x_down)
@@ -41,7 +41,8 @@ class NormalizedPlot:
         self.fig.tight_layout()
         self.fig.savefig("figure.jpg")
         #self.fig.savefig(f'{self.serial_number}{self.rework_letter} Normalized Pressure vs Turns')
-        plt.show()
+        #plt.show()
+        return self.fig
 
 
 def main() -> None:
@@ -53,7 +54,7 @@ def main() -> None:
     x_down: list[float|None] = x_up
     y_down: list[float|None] = [num*1.5 for num in y_up if num is not None]
     plot = NormalizedPlot(valve_serial_number, rework_letter, base_pressure)
-    plot.plot(x_up, y_up, x_down, y_down) 
+    plot.plot(x_up, y_up, x_down, y_down) # type: ignore
 
 if __name__ == '__main__':
     main()

@@ -1,4 +1,5 @@
 import csv
+from matplotlib.figure import Figure
 from PySide6.QtCore import QTimer, QEventLoop
 from helpers.normalized_data_plotter import NormalizedPlot
 from api.pfeiffer_tpg26x import TPG261
@@ -156,9 +157,7 @@ class ValveTest:
 
         print('CSV file written successfully!')
 
-    def _plot_valve_test(self, turns_up, pressure_up, turns_down, pressure_down) -> None:
-        normalized_plot = NormalizedPlot(self.serial_number, self.rework_letter, self.base_pressure)
-        normalized_plot.plot(turns_up, pressure_up, turns_down, pressure_down)
+    
 
     @staticmethod
     def _percent_change(starting_num: float, ending_num: float) -> float:
@@ -172,6 +171,10 @@ class ValveTest:
         QTimer.singleShot(int(seconds*1000), loop.quit)
         loop.exec()
 
+    def plot_data(self) -> Figure:
+        normalized_plot = NormalizedPlot(self.serial_number, self.rework_letter, self.base_pressure)
+        return normalized_plot.plot(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
+
     def run(self) -> None:
         self.running = True
         while self.running:
@@ -181,10 +184,10 @@ class ValveTest:
             if self._valve_is_opening():
                 self._open_by_STEP_SIZE_and_wait_for_stability()
             self._check_if_valve_test_needs_to_stop()
+        self._create_csv()
+        
 
     def stop(self) -> None:
         self.running = False
         if int(self.motor.query_position()) != 0:
             self.motor.home_motor()
-        self._create_csv()
-        self._plot_valve_test(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
