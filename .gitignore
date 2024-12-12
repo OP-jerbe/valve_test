@@ -1,5 +1,4 @@
 valve_test.ini
 __pycache__/
-output.csv
-figure.jpg
+/results
 project_tree.txt
