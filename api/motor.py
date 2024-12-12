@@ -19,36 +19,59 @@ class MotorController:
         self.end_character = "R"
         self.carriage_return = "\r"
 
+    # def _decode_response(self, raw_response: bytes) -> str:
+    #     decoded_response = raw_response.decode(errors='ignore').strip()
+    #     print(f'{decoded_response = }')
+    #     try:
+    #         try:
+    #             return decoded_response.split('`')[1][:-1]
+    #         except:
+    #             pass
+    #         try:
+    #             return decoded_response.split('@')[1][:-1]
+    #         except:
+    #             pass
+    #         try:
+    #             return decoded_response.split('?')[1][:-1]
+    #         except:
+    #             pass
+    #         try:
+    #             return decoded_response.split('c')[1][:-1]
+    #         except:
+    #             pass
+    #         try:
+    #             return decoded_response.split('O')[1][:-1]
+    #         except:
+    #             pass
+    #         try:
+    #             return decoded_response.split('b')[1][:-1]
+    #         except Exception as e:
+    #             print(f'\nCould not decode reponse.\nError: {e}\n')
+    #     except Exception as e:
+    #         print(f'\nCould not decode reponse.\nError: {e}\n')
+    #     return ''
+
     def _decode_response(self, raw_response: bytes) -> str:
+        """Decode the raw response and extract the relevant part."""
+        # Decode and clean up the raw response
         decoded_response = raw_response.decode(errors='ignore').strip()
         print(f'{decoded_response = }')
-        try:
+
+        # Define split characters to try
+        split_chars = ['`', '@', '?', 'c', 'O', 'b']
+
+        # Attempt to split the response using each character
+        for char in split_chars:
             try:
-                return decoded_response.split('`')[1][:-1]
-            except:
-                pass
-            try:
-                return decoded_response.split('@')[1][:-1]
-            except:
-                pass
-            try:
-                return decoded_response.split('?')[1][:-1]
-            except:
-                pass
-            try:
-                return decoded_response.split('c')[1][:-1]
-            except:
-                pass
-            try:
-                return decoded_response.split('O')[1][:-1]
-            except:
-                pass
-            try:
-                return decoded_response.split('b')[1][:-1]
+                result = decoded_response.split(char)[1][:-1]
+                return result
+            except IndexError:
+                continue  # Move to the next character if split fails
             except Exception as e:
-                print(f'\nCould not decode reponse.\nError: {e}\n')
-        except Exception as e:
-            print(f'\nCould not decode reponse.\nError: {e}\n')
+                print(f'Error decoding response with "{char}": {e}')
+        
+        # Log and return empty string if no split is successful
+        print('Could not decode response.')
         return ''
 
     def send_command(self, command) -> str:
