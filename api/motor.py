@@ -20,38 +20,6 @@ class MotorController:
         self.end_character = "R"
         self.carriage_return = "\r"
 
-    # def _decode_response(self, raw_response: bytes) -> str:
-    #     decoded_response = raw_response.decode(errors='ignore').strip()
-    #     print(f'{decoded_response = }')
-    #     try:
-    #         try:
-    #             return decoded_response.split('`')[1][:-1]
-    #         except:
-    #             pass
-    #         try:
-    #             return decoded_response.split('@')[1][:-1]
-    #         except:
-    #             pass
-    #         try:
-    #             return decoded_response.split('?')[1][:-1]
-    #         except:
-    #             pass
-    #         try:
-    #             return decoded_response.split('c')[1][:-1]
-    #         except:
-    #             pass
-    #         try:
-    #             return decoded_response.split('O')[1][:-1]
-    #         except:
-    #             pass
-    #         try:
-    #             return decoded_response.split('b')[1][:-1]
-    #         except Exception as e:
-    #             print(f'\nCould not decode reponse.\nError: {e}\n')
-    #     except Exception as e:
-    #         print(f'\nCould not decode reponse.\nError: {e}\n')
-    #     return ''
-
     @staticmethod
     def pause(seconds: float) -> None:
         loop = QEventLoop()
@@ -240,7 +208,7 @@ if __name__ == "__main__":
     motor = MotorController(port="COM3")
     try:
         motor.set_current(running_current=100, holding_current=2)
-        motor.set_velocity_and_acceleration(velocity=150, acceleration=50)
+        motor.set_velocity_and_acceleration(velocity=10, acceleration=20)
         motor.set_microsteps_per_step(MICROSTEPS_PER_STEP)
         motor.query_microsteps_per_step()
         pause(0.25)

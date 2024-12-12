@@ -99,8 +99,8 @@ class App:
         microstep: int = MICROSTEPS_PER_STEP
         running_current: int = 100
         holding_current: int = 2
-        velocity: int = 100
-        acceleration: int = 50
+        velocity: int = 10
+        acceleration: int = 20
         rotation_direction: str = 'normal'
 
         motor: MotorController = MotorController(port=com_port)
