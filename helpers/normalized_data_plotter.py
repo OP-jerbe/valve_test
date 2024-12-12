@@ -46,9 +46,9 @@ class NormalizedPlot:
         return self.fig
     
     def save_figure(self) -> None:
-        date_time: str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        date_time: str = datetime.now().strftime("%Y-%m-%d %H_%M")
         file_name: str = f'{date_time} {self.serial_number}{self.rework_letter} Normalized Pressure vs Turns.jpg'
-        results_dir: Path = Path('../results')
+        results_dir: Path = Path('results')
         plot_figures_dir: str = 'plot_figures'
         valve_dir: str = f'{self.serial_number}'
         folder_path: Path = results_dir / plot_figures_dir / valve_dir

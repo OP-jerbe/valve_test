@@ -144,9 +144,9 @@ class ValveTest:
         print('CSV file written successfully!')
 
     def save_csv(self) -> None:
-        date_time: str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        date_time: str = datetime.now().strftime("%Y-%m-%d %H_%M")
         file_name: str = f'{date_time} {self.serial_number}{self.rework_letter}.csv'
-        results_dir: Path = Path('../results')
+        results_dir: Path = Path('results')
         csv_files_dir: str = 'csv_files'
         valve_dir: str = f'{self.serial_number}'
         folder_path: Path = results_dir / csv_files_dir / valve_dir
