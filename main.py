@@ -49,8 +49,9 @@ class App:
         self.gui.show()
 
     def open_normalized_plot_window(self, figure: Figure) -> None:
-        self.normalized_plot_window = NormalizedPlotWindow(figure)
+        self.normalized_plot_window = NormalizedPlotWindow(figure, parent=self.gui)
         self.normalized_plot_window.draw_figure()
+        self.normalized_plot_window.exec()
 
     def open_plot_window(self) -> None:
             """Open the plot window and simulate pressure data collection."""
@@ -98,8 +99,8 @@ class App:
         microstep: int = MICROSTEPS_PER_STEP
         running_current: int = 100
         holding_current: int = 2
-        velocity: int = 150
-        acceleration: int = 500
+        velocity: int = 100
+        acceleration: int = 50
         rotation_direction: str = 'normal'
 
         motor: MotorController = MotorController(port=com_port)
