@@ -1,5 +1,6 @@
 import serial
-import time
+from PySide6.QtCore import QTimer, QEventLoop
+
 
 class MotorController:
     def __init__(self, port, baud_rate=9600, address=1) -> None:
@@ -51,6 +52,12 @@ class MotorController:
     #         print(f'\nCould not decode reponse.\nError: {e}\n')
     #     return ''
 
+    @staticmethod
+    def pause(seconds: float) -> None:
+        loop = QEventLoop()
+        QTimer.singleShot(int(seconds*1000), loop.quit)
+        loop.exec()
+
     def _decode_response(self, raw_response: bytes) -> str:
         """Decode the raw response and extract the relevant part."""
         # Decode and clean up the raw response
@@ -85,7 +92,7 @@ class MotorController:
         print(f'{full_command = }')
 
         self.serial.write(full_command.encode())
-        time.sleep(0.1)  # Give the controller some time to respond
+        self.pause(0.1)  # Give the controller some time to respond
 
         raw_response: bytes = self.serial.readline()
         print(f'{raw_response = }')
@@ -217,9 +224,17 @@ class MotorController:
 if __name__ == "__main__":
     import time
     import sys
-    import os
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'helpers')))
+    from pathlib import Path
+
+    current_file = Path(__file__).resolve()
+    helpers_dir = current_file.parent.parent / 'helpers'
+    sys.path.append(str(helpers_dir))
     from constants import MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV # type: ignore
+
+    def pause(seconds: float) -> None:
+        loop = QEventLoop()
+        QTimer.singleShot(int(seconds*1000), loop.quit)
+        loop.exec()
 
     motor = MotorController(port="COM3")
     try:
@@ -227,13 +242,13 @@ if __name__ == "__main__":
         motor.set_velocity_and_acceleration(velocity=150, acceleration=500)
         motor.set_microsteps_per_step(MICROSTEPS_PER_STEP)
         motor.query_microsteps_per_step()
-        time.sleep(0.25)
+        pause(0.25)
 
         motor.set_rotation_direction('normal') # open the valve
         motor.set_rotation_direction('reverse') # close the valve
 
         motor.move_relative(MICROSTEPS_PER_REV//4)
-        time.sleep(1)
+        pause(1)
         motor.set_zero()
         print("Current Position:", motor.query_position())
     finally:

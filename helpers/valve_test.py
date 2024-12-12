@@ -65,11 +65,6 @@ class ValveTest:
     def _valve_is_closing(self) -> bool:
         return self.direction == 'down'
 
-    def pause(self, seconds: float) -> None:
-        loop = QEventLoop()
-        QTimer.singleShot(int(seconds*1000), loop.quit)
-        loop.exec()
-
     def _log_turns_and_pressure(self, valve_position: float, pressure: float) -> None:
         if self._valve_is_opening():
             self.turns_up_log.append(valve_position)
@@ -171,6 +166,12 @@ class ValveTest:
         difference: float = ending_num - starting_num
         percent_change: float = abs(difference) / starting_num * 100
         return percent_change
+
+    @staticmethod
+    def pause(seconds: float) -> None:
+        loop = QEventLoop()
+        QTimer.singleShot(int(seconds*1000), loop.quit)
+        loop.exec()
 
     def run(self) -> None:
         self.running = True
