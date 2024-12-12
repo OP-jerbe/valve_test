@@ -5,6 +5,8 @@ except:
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
+from datetime import datetime
 
 
 class NormalizedPlot:
@@ -39,10 +41,23 @@ class NormalizedPlot:
         self.ax.plot(self.x_down, self.normalized_y_down, label='Closing', color='lightskyblue', marker='o', markersize=2)
         self.ax.legend(fontsize=5)
         self.fig.tight_layout()
-        self.fig.savefig("figure.jpg")
-        #self.fig.savefig(f'{self.serial_number}{self.rework_letter} Normalized Pressure vs Turns')
+        self.save_figure()
         #plt.show()
         return self.fig
+    
+    def save_figure(self) -> None:
+        date_time: str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        file_name: str = f'{date_time} {self.serial_number}{self.rework_letter} Normalized Pressure vs Turns.jpg'
+        results_dir: Path = Path('../results')
+        plot_figures_dir: str = 'plot_figures'
+        valve_dir: str = f'{self.serial_number}'
+        folder_path: Path = results_dir / plot_figures_dir / valve_dir
+        folder_path.mkdir(parents=True, exist_ok=True)
+        if folder_path.exists():
+            file_path: Path = folder_path / file_name
+            self.fig.savefig(file_path)
+        else:
+            print(f"Could not save figure. {folder_path} does not exist")
 
 
 def main() -> None:

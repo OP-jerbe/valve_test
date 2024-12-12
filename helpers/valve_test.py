@@ -1,4 +1,6 @@
 import csv
+from datetime import datetime
+from pathlib import Path
 from matplotlib.figure import Figure
 from PySide6.QtCore import QTimer, QEventLoop
 from helpers.normalized_data_plotter import NormalizedPlot
@@ -118,9 +120,8 @@ class ValveTest:
                 print('Valve test complete.')
                 # ADD: display a message window that says the valve test is complete.
 
-    def _create_csv(self) -> None:
-        #with open(f'{self.serial_number}{self.rework_letter}.csv', mode='w', newline='') as file:
-        with open(f'output.csv', mode='w', newline='') as file:
+    def _create_csv(self, file_path: Path) -> None:
+        with open(file_path, mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['Turns Up', 'Pressure Up', 'Turns Down', 'Pressure Down'])
 
@@ -141,6 +142,20 @@ class ValveTest:
                 writer.writerow(row)
 
         print('CSV file written successfully!')
+
+    def save_csv(self) -> None:
+        date_time: str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        file_name: str = f'{date_time} {self.serial_number}{self.rework_letter}.csv'
+        results_dir: Path = Path('../results')
+        csv_files_dir: str = 'csv_files'
+        valve_dir: str = f'{self.serial_number}'
+        folder_path: Path = results_dir / csv_files_dir / valve_dir
+        folder_path.mkdir(parents=True, exist_ok=True)
+        if folder_path.exists():
+            file_path: Path = folder_path / file_name
+            self._create_csv(file_path)
+        else:
+            print(f"Could not save figure. {folder_path} does not exist")
 
     @staticmethod
     def _percent_change(starting_num: float, ending_num: float) -> float:
@@ -165,7 +180,7 @@ class ValveTest:
             self._check_if_valve_has_reached_turn_around_point()
             self._move_by_STEP_SIZE_and_wait_for_stability()
             self._check_if_valve_test_needs_to_stop()
-        self._create_csv()
+        self.save_csv()
         
     def stop(self) -> None:
         self.running = False

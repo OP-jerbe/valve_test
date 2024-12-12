@@ -53,18 +53,18 @@ class App:
         self.normalized_plot_window.draw_figure()
         self.normalized_plot_window.exec()
 
-    def open_plot_window(self) -> None:
-            """Open the plot window and simulate pressure data collection."""
-            serial_number = self.gui.serial_number_input.text()
-            rework_letter = self.gui.rework_letter_input.text()
-            base_pressure = self.gui.base_pressure_input.text()
-            parent = self.gui
-            self.plot_window = PlotWindow(serial_number=serial_number, rework_letter=rework_letter, base_pressure=base_pressure, parent=parent)
-            self.plot_window.start_updating()
+    # def open_plot_window(self) -> None:
+    #         """Open the plot window and simulate pressure data collection."""
+    #         serial_number = self.gui.serial_number_input.text()
+    #         rework_letter = self.gui.rework_letter_input.text()
+    #         base_pressure = self.gui.base_pressure_input.text()
+    #         parent = self.gui
+    #         self.plot_window = PlotWindow(serial_number=serial_number, rework_letter=rework_letter, base_pressure=base_pressure, parent=parent)
+    #         self.plot_window.start_updating()
 
-            # Simulate adding measurements (replace with real data in practice)
-            #self.simulate_data_collection()
-            self.plot_window.exec()
+    #         # Simulate adding measurements (replace with real data in practice)
+    #         #self.simulate_data_collection()
+    #         self.plot_window.exec()
 
     # def simulate_data_collection(self) -> None:
     #     """Simulate adding data to the plot (replace this with real data acquisition)."""
@@ -145,7 +145,7 @@ class App:
         serial_number = self.gui.serial_number_input.text()
         rework_letter = self.gui.rework_letter_input.text()
         base_pressure = self.gui.base_pressure_input.text()
-        #self.open_plot_window()
+        #self.open_plot_window() # for live plotting
         if self.pressure_gauge:
             self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure)
             self.valve_test.run()
