@@ -94,11 +94,14 @@ class ValveTest:
         if self._pressure_is_above_PRESSURE_TURN_POINT() and self.direction == 'up':
                 self._open_valve(MICROSTEPS_PER_REV) # open valve one full turn
                 self.pause(5)
+                self.pressure = self._get_pressure()
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self.direction = 'down'
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self._close_valve(MICROSTEPS_PER_REV) # close valve one full turn
-                self.pause(5)
+                self.pause(30)
+                self.pressure = self._get_pressure()
+                self._log_turns_and_pressure(self.valve_position, self.pressure)
 
     def _move_by_STEP_SIZE_and_wait_for_stability(self) -> None:
         if self.direction == 'up':
