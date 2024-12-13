@@ -79,6 +79,18 @@ class App:
     #     self.data_timer.timeout.connect(add_fake_data)
     #     self.data_timer.start(1000)  # Add data every second
 
+    def disable_motor_controls(self) -> None:
+        self.gui.open_button.setDisabled(True)
+        self.gui.close_button.setDisabled(True)
+        self.gui.home_button.setDisabled(True)
+        self.gui.set_zero_button.setDisabled(True)
+
+    def enable_motor_controls(self) -> None:
+        self.gui.open_button.setDisabled(False)
+        self.gui.close_button.setDisabled(False)
+        self.gui.home_button.setDisabled(False)
+        self.gui.set_zero_button.setDisabled(False)
+
     def _set_position_text(self) -> None:
         motor_position: str = self.motor.query_position()
         if motor_position != '':
@@ -148,7 +160,11 @@ class App:
         #self.open_plot_window() # for live plotting
         if self.pressure_gauge:
             self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure)
+            self.disable_motor_controls()
+            self.gui.start_test_button.setDisabled(True)
             self.valve_test.run()
+            self.enable_motor_controls()
+            self.gui.start_test_button.setDisabled(False)
             self.valve_test_fig = self.valve_test.plot_data()
             self.open_normalized_plot_window(self.valve_test_fig)
 
