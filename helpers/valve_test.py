@@ -105,9 +105,9 @@ class ValveTest:
             self._open_valve(MOTOR_STEP_SIZE)
         else:
             self._close_valve(MOTOR_STEP_SIZE)
-        self.pause(0.05)
+        self.pause(1)
         self.valve_position = self._get_valve_position()
-        self.pause(HOLD_TIME)
+        self.pause(HOLD_TIME-1)
         self.pressure = self._get_pressure()
         if not self._pressure_is_within_AOI_bounds():
             self._log_turns_and_pressure(self.valve_position, self.pressure)

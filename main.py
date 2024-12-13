@@ -112,7 +112,7 @@ class App:
         running_current: int = 100
         holding_current: int = 2
         velocity: int = 300
-        acceleration: int = 150
+        acceleration: int = 50
         rotation_direction: str = 'normal'
 
         motor: MotorController = MotorController(port=com_port)
