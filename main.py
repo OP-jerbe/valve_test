@@ -46,6 +46,8 @@ class App:
         self.gui.go_to_position_input.returnPressed.connect(self.go_to_position_button_handler)
         self.gui.start_test_button.pressed.connect(self.start_test_button_handler)
 
+        self.valve_test: ValveTest | None = None
+
         self.gui.show()
 
     def open_normalized_plot_window(self, figure: Figure) -> None:
@@ -79,17 +81,27 @@ class App:
     #     self.data_timer.timeout.connect(add_fake_data)
     #     self.data_timer.start(1000)  # Add data every second
 
-    def disable_motor_controls(self) -> None:
+    def disable_gui(self) -> None:
         self.gui.open_button.setDisabled(True)
         self.gui.close_button.setDisabled(True)
         self.gui.home_button.setDisabled(True)
         self.gui.set_zero_button.setDisabled(True)
+        self.gui.go_to_position_button.setDisabled(True)
+        self.gui.go_to_position_input.setDisabled(True)
+        self.gui.serial_number_input.setDisabled(True)
+        self.gui.rework_letter_input.setDisabled(True)
+        self.gui.base_pressure_input.setDisabled(True)
 
-    def enable_motor_controls(self) -> None:
+    def enable_gui(self) -> None:
         self.gui.open_button.setDisabled(False)
         self.gui.close_button.setDisabled(False)
         self.gui.home_button.setDisabled(False)
         self.gui.set_zero_button.setDisabled(False)
+        self.gui.go_to_position_button.setDisabled(False)
+        self.gui.go_to_position_input.setDisabled(False)
+        self.gui.serial_number_input.setDisabled(False)
+        self.gui.rework_letter_input.setDisabled(False)
+        self.gui.base_pressure_input.setDisabled(False)
 
     def _set_position_text(self) -> None:
         motor_position: str = self.motor.query_position()
@@ -154,29 +166,32 @@ class App:
             self.update_valve_position_until(valve_set_point=target_valve_position)
 
     def start_test_button_handler(self) -> None:
-        serial_number = self.gui.serial_number_input.text()
-        rework_letter = self.gui.rework_letter_input.text()
-        base_pressure = self.gui.base_pressure_input.text()
-        #self.open_plot_window() # for live plotting
-        if self.pressure_gauge:
-            self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure)
-            self.disable_motor_controls()
-            self.gui.start_test_button.setDisabled(True)
-            self.valve_test.run()
-            self.enable_motor_controls()
-            self.gui.start_test_button.setDisabled(False)
-            self.valve_test_fig = self.valve_test.plot_data()
-            self.open_normalized_plot_window(self.valve_test_fig)
+        if not self.valve_test: # if there is not a valve test running
+            self.gui.start_test_button.clearFocus()
+            serial_number = self.gui.serial_number_input.text()
+            rework_letter = self.gui.rework_letter_input.text()
+            base_pressure = self.gui.base_pressure_input.text()
+            #self.open_plot_window() # for live plotting
+            if self.pressure_gauge:
+                self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure)
+                self.disable_gui()
+                self.valve_test.run()
+                self.enable_gui()
+                self.valve_test_fig = self.valve_test.plot_data()
+                self.open_normalized_plot_window(self.valve_test_fig)
+                self.valve_test = None
+        else:
+            print("There is already a valve test running.")
 
     def cleanup(self) -> None:
         """
-        Ensure the COM ports close when the application closes.
+        Ensure the COM ports close and valve test is stopped when the application closes.
         """
         if self.motor:
             self.motor.close_port()
         if self.pressure_gauge:
             self.pressure_gauge.close_port()
-        if self.valve_test.running:
+        if self.valve_test and self.valve_test.running:
             self.valve_test.stop()
         time.sleep(0.25)
     
