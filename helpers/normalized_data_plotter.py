@@ -22,7 +22,7 @@ class NormalizedPlot:
         self.ax.set_ylabel('Normalized Pressure (mBar)', fontsize=7)
         self.ax.set_yscale('log')
         self.ax.set_xlim(-0.5, 12.5)
-        self.ax.set_ylim(1e-8, 1e-3)
+        self.ax.set_ylim(1e-9, 1e-3)
         self.ax.grid(True)
         self.ax.fill_betweenx([AOI_LOWER_BOUND,AOI_UPPER_BOUND],[-0.5],[12.5],alpha = 0.25,color='silver')
         self.ax.tick_params(axis='both', labelsize=5)
