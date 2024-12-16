@@ -4,7 +4,7 @@ from matplotlib.figure import Figure
 from api.motor import MotorController
 from api.pfeiffer_tpg26x import TPG261
 from gui.gui import QApplication, MainWindow
-from gui.plot_window import PlotWindow
+from gui.live_plot_window import PlotWindow
 from gui.normalized_plot_window import NormalizedPlotWindow
 from helpers.constants import VERSION, MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
 from helpers.ini_reader import load_ini, find_comport
