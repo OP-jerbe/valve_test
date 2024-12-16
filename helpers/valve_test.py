@@ -5,6 +5,7 @@ from matplotlib.figure import Figure
 from PySide6.QtCore import QTimer, QEventLoop
 from PySide6.QtWidgets import QLabel
 from helpers.normalized_data_plotter import NormalizedPlot
+from gui.live_plot_window import LivePlotWindow
 from api.pfeiffer_tpg26x import TPG261
 from api.motor import MotorController
 from helpers.constants import (
@@ -13,13 +14,15 @@ from helpers.constants import (
 
 
 class ValveTest:
-    def __init__(self, motor: MotorController, pressure_gauge: TPG261, serial_number: str, rework_letter: str, base_pressure: str, valve_position_label: QLabel) -> None:
+    def __init__(self, motor: MotorController, pressure_gauge: TPG261, serial_number: str, rework_letter: str,
+                 base_pressure: str, valve_position_label: QLabel, live_plot_window: LivePlotWindow) -> None:
         self.motor: MotorController = motor
         self.tpg: TPG261 = pressure_gauge
         self.serial_number: str = serial_number
         self.rework_letter: str = rework_letter
         self.base_pressure: str = base_pressure
         self.actual_position_label: QLabel = valve_position_label
+        self.live_plot_window: LivePlotWindow = live_plot_window
 
         self.running: bool = False
         self.direction: str = 'up'
@@ -88,6 +91,7 @@ class ValveTest:
                 checklist.append(self.pressure)
                 print(f'{checklist = }')
                 self._log_turns_and_pressure(valve_position, self.pressure)
+                self.live_plot_window.update_plot(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
                 if not self._pressure_stable(checklist) and len(checklist) >= 2:
                     print('Pressure not stable.\n')
                     checklist.clear()
@@ -106,11 +110,13 @@ class ValveTest:
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self.direction = 'down'
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
+                self.live_plot_window.update_plot(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
                 self._close_valve(MICROSTEPS_PER_REV) # close valve one full turn
                 self.pause(30)
                 self.valve_position = self._get_valve_position()
                 self.pressure = self._get_pressure()
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
+                self.live_plot_window.update_plot(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
 
     def _move_by_STEP_SIZE_and_wait_for_stability(self) -> None:
         if self.direction == 'up':
@@ -123,6 +129,7 @@ class ValveTest:
         self.pressure = self._get_pressure()
         if not self._pressure_is_within_AOI_bounds():
             self._log_turns_and_pressure(self.valve_position, self.pressure)
+            self.live_plot_window.update_plot(self.turns_up_log, self.pressure_up_log, self.turns_down_log, self.pressure_down_log)
             return
         self._wait_for_stability(self.valve_position)
 

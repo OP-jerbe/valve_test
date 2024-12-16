@@ -4,7 +4,7 @@ from matplotlib.figure import Figure
 from api.motor import MotorController
 from api.pfeiffer_tpg26x import TPG261
 from gui.gui import QApplication, MainWindow
-from gui.live_plot_window import PlotWindow
+from gui.live_plot_window import LivePlotWindow
 from gui.normalized_plot_window import NormalizedPlotWindow
 from helpers.constants import VERSION, MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
 from helpers.ini_reader import load_ini, find_comport
@@ -61,7 +61,7 @@ class App:
     #         rework_letter = self.gui.rework_letter_input.text()
     #         base_pressure = self.gui.base_pressure_input.text()
     #         parent = self.gui
-    #         self.plot_window = PlotWindow(serial_number=serial_number, rework_letter=rework_letter, base_pressure=base_pressure, parent=parent)
+    #         self.plot_window = LivePlotWindow(serial_number=serial_number, rework_letter=rework_letter, base_pressure=base_pressure, parent=parent)
     #         self.plot_window.start_updating()
 
     #         # Simulate adding measurements (replace with real data in practice)
@@ -171,9 +171,9 @@ class App:
             serial_number = self.gui.serial_number_input.text()
             rework_letter = self.gui.rework_letter_input.text()
             base_pressure = self.gui.base_pressure_input.text()
-            #self.open_plot_window() # for live plotting
             if self.pressure_gauge:
-                self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure, self.gui.actual_position_reading)
+                self.live_plot_window: LivePlotWindow = LivePlotWindow(serial_number, rework_letter, base_pressure)
+                self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure, self.gui.actual_position_reading, self.live_plot_window)
                 self.disable_gui()
                 self.valve_test.run()
                 self.enable_gui()
