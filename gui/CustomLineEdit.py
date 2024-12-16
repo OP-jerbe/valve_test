@@ -6,7 +6,8 @@ class CustomLineEdit(QLineEdit):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.inputs_to_check: list = []
-        self.button: QPushButton | None = None
+        self.start_button: QPushButton | None = None
+        self.stop_button: QPushButton | None = None
 
     def keyPressEvent(self, arg__1: QKeyEvent) -> None:
         if arg__1.key() in (Qt.Key_Return, Qt.Key_Enter): # type: ignore
@@ -16,8 +17,10 @@ class CustomLineEdit(QLineEdit):
     
     def focusOutEvent(self, arg__1: QFocusEvent) -> None:
         super().focusOutEvent(arg__1)
-        if self.button is not None:
+        if self.start_button is not None and self.stop_button is not None:
             if all(edit.text().strip() for edit in self.inputs_to_check):
-                self.button.setEnabled(True)
+                self.start_button.setEnabled(True)
+                self.stop_button.setEnabled(True)
             else:
-                self.button.setEnabled(False)
+                self.start_button.setEnabled(False)
+                self.stop_button.setEnabled(False)

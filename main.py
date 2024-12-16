@@ -45,6 +45,7 @@ class App:
         self.gui.go_to_position_button.clicked.connect(self.go_to_position_button_handler)
         self.gui.go_to_position_input.returnPressed.connect(self.go_to_position_button_handler)
         self.gui.start_test_button.pressed.connect(self.start_test_button_handler)
+        self.gui.stop_test_button.pressed.connect(self.stop_test_button_handler)
 
         self.valve_test: ValveTest | None = None
 
@@ -53,33 +54,7 @@ class App:
     def open_normalized_plot_window(self, figure: Figure) -> None:
         self.normalized_plot_window = NormalizedPlotWindow(figure, parent=self.gui)
         self.normalized_plot_window.draw_figure()
-        self.normalized_plot_window.exec()
-
-    # def open_plot_window(self) -> None:
-    #         """Open the plot window and simulate pressure data collection."""
-    #         serial_number = self.gui.serial_number_input.text()
-    #         rework_letter = self.gui.rework_letter_input.text()
-    #         base_pressure = self.gui.base_pressure_input.text()
-    #         parent = self.gui
-    #         self.plot_window = LivePlotWindow(serial_number=serial_number, rework_letter=rework_letter, base_pressure=base_pressure, parent=parent)
-    #         self.plot_window.start_updating()
-
-    #         # Simulate adding measurements (replace with real data in practice)
-    #         #self.simulate_data_collection()
-    #         self.plot_window.exec()
-
-    # def simulate_data_collection(self) -> None:
-    #     """Simulate adding data to the plot (replace this with real data acquisition)."""
-    #     def add_fake_data() -> None:
-    #         # Generate fake leak valve turns and pressures
-    #         turn = len(self.plot_window.turns) + 1
-    #         pressure = random.uniform(1e-7, 1e-5)
-    #         self.plot_window.add_measurement(turn, pressure)
-
-    #     # Use a timer to simulate adding data every second
-    #     self.data_timer = QTimer()
-    #     self.data_timer.timeout.connect(add_fake_data)
-    #     self.data_timer.start(1000)  # Add data every second
+        self.normalized_plot_window.show()
 
     def disable_gui(self) -> None:
         self.gui.open_button.setDisabled(True)
@@ -172,7 +147,7 @@ class App:
             rework_letter = self.gui.rework_letter_input.text()
             base_pressure = self.gui.base_pressure_input.text()
             if self.pressure_gauge:
-                self.live_plot_window: LivePlotWindow = LivePlotWindow(serial_number, rework_letter, base_pressure)
+                self.live_plot_window: LivePlotWindow = LivePlotWindow(serial_number, rework_letter, base_pressure, parent=self.gui)
                 self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure, self.gui.actual_position_reading, self.live_plot_window)
                 self.disable_gui()
                 self.valve_test.run()
@@ -182,6 +157,13 @@ class App:
                 self.valve_test = None
         else:
             print("There is already a valve test running.")
+
+    def stop_test_button_handler(self) -> None:
+        if self.valve_test and self.valve_test.running:
+            self.valve_test.stop()
+            self.enable_gui()
+            self.open_normalized_plot_window(self.valve_test_fig)
+            self.valve_test = None
 
     def cleanup(self) -> None:
         """

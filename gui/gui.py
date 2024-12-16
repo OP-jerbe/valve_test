@@ -57,17 +57,24 @@ class MainWindow(QMainWindow):
         self.start_test_button = QPushButton('Start Test')
         self.start_test_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.start_test_button.setDisabled(True)
+        self.stop_test_button = QPushButton('Stop Test')
+        self.stop_test_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.stop_test_button.setDisabled(True)
 
-        # Set up relationships to activate start button
+        # Set up relationships to activate start/stop buttons
         inputs_to_check = [self.serial_number_input, self.rework_letter_input, self.base_pressure_input]
         self.serial_number_input.inputs_to_check = inputs_to_check
         self.rework_letter_input.inputs_to_check = inputs_to_check
         self.base_pressure_input.inputs_to_check = inputs_to_check
 
         # Set button to activate/deactivate
-        self.serial_number_input.button = self.start_test_button
-        self.rework_letter_input.button = self.start_test_button
-        self.base_pressure_input.button = self.start_test_button
+        self.serial_number_input.start_button = self.start_test_button
+        self.rework_letter_input.start_button = self.start_test_button
+        self.base_pressure_input.start_button = self.start_test_button
+
+        self.serial_number_input.stop_button = self.stop_test_button
+        self.rework_letter_input.stop_button = self.stop_test_button
+        self.base_pressure_input.stop_button = self.stop_test_button
 
         # Create Right Side of Main Window Elements
         self.right_title_label = QLabel('Motor Control')
@@ -112,13 +119,14 @@ class MainWindow(QMainWindow):
         h_left_labels_and_inputs_layout.addLayout(v_left_labels_layout)
         h_left_labels_and_inputs_layout.addLayout(v_left_inputs_layout)
 
-        g_start_button_layout = QGridLayout()
-        g_start_button_layout.addWidget(self.start_test_button, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+        h_test_buttons_layout = QHBoxLayout()
+        h_test_buttons_layout.addWidget(self.start_test_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        h_test_buttons_layout.addWidget(self.stop_test_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         g_left_sub_main_layout = QGridLayout()
         g_left_sub_main_layout.addLayout(g_left_title_layout, 0, 0)
         g_left_sub_main_layout.addLayout(h_left_labels_and_inputs_layout, 1, 0)
-        g_left_sub_main_layout.addLayout(g_start_button_layout, 2, 0)
+        g_left_sub_main_layout.addLayout(h_test_buttons_layout, 2, 0)
 
         # Create a vertical line
         vertical_line = QFrame()
@@ -167,24 +175,7 @@ class MainWindow(QMainWindow):
             if focused_widget is not None:
                 focused_widget.clearFocus()
         return super().eventFilter(watched, event)
-
-    # def update_valve_position(self, position: float):
-    #     """
-    #     Update the label with the motor's position.
-    #     """
-    #     self.actual_position_reading.setText(f'{position:.2f}')
-        
-    # def closeEvent(self, event) -> None:
-    #     # Confirm the user wants to exit the application.
-    #     reply = QMessageBox.question(self, 'Confirmation',
-    #                                  'Are you sure you want to close the window?',
-    #                                  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
-    #     if reply == QMessageBox.StandardButton.Yes:
-    #         event.accept()
-    #     else:
-    #         event.ignore()
-
-
+    
 
 if __name__ == '__main__':
     app = QApplication([])
