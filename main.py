@@ -173,7 +173,7 @@ class App:
             base_pressure = self.gui.base_pressure_input.text()
             #self.open_plot_window() # for live plotting
             if self.pressure_gauge:
-                self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure)
+                self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure, self.gui.actual_position_reading)
                 self.disable_gui()
                 self.valve_test.run()
                 self.enable_gui()

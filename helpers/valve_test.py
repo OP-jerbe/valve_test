@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from matplotlib.figure import Figure
 from PySide6.QtCore import QTimer, QEventLoop
+from PySide6.QtWidgets import QLabel
 from helpers.normalized_data_plotter import NormalizedPlot
 from api.pfeiffer_tpg26x import TPG261
 from api.motor import MotorController
@@ -12,12 +13,13 @@ from helpers.constants import (
 
 
 class ValveTest:
-    def __init__(self, motor: MotorController, pressure_gauge: TPG261, serial_number: str, rework_letter: str, base_pressure: str) -> None:
+    def __init__(self, motor: MotorController, pressure_gauge: TPG261, serial_number: str, rework_letter: str, base_pressure: str, valve_position_label: QLabel) -> None:
         self.motor: MotorController = motor
         self.tpg: TPG261 = pressure_gauge
         self.serial_number: str = serial_number
         self.rework_letter: str = rework_letter
         self.base_pressure: str = base_pressure
+        self.actual_position_label: QLabel = valve_position_label
 
         self.running: bool = False
         self.direction: str = 'up'
@@ -28,6 +30,11 @@ class ValveTest:
         self.pressure_down_log: list[float] = list()
         self.turns_up_log: list[float] = list()
         self.turns_down_log: list[float] = list()
+
+    def _update_valve_position_label(self, valve_position: float) -> None:
+        valve_position_str: str = f'{valve_position:.2f}'
+        self.actual_position_label.setText(valve_position_str)
+        #self.actual_position_label.update() # not sure if this is needed or not.
 
     def _get_pressure(self) -> float:
         pressure, (status_code, status_string) = self.tpg.pressure_gauge()
@@ -42,6 +49,7 @@ class ValveTest:
     def _get_valve_position(self) -> float:
         motor_position: int = self._get_motor_position()
         valve_position: float = motor_position / MICROSTEPS_PER_REV
+        self._update_valve_position_label(valve_position)
         return round(valve_position, 2)
 
     def _open_valve(self, amount: int) -> None:
@@ -94,12 +102,14 @@ class ValveTest:
         if self._pressure_is_above_PRESSURE_TURN_POINT() and self.direction == 'up':
                 self._open_valve(MICROSTEPS_PER_REV) # open valve one full turn
                 self.pause(5)
+                self.valve_position = self._get_valve_position()
                 self.pressure = self._get_pressure()
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self.direction = 'down'
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
                 self._close_valve(MICROSTEPS_PER_REV) # close valve one full turn
                 self.pause(30)
+                self.valve_position = self._get_valve_position()
                 self.pressure = self._get_pressure()
                 self._log_turns_and_pressure(self.valve_position, self.pressure)
 
