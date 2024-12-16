@@ -34,7 +34,6 @@ class ValveTest:
     def _update_valve_position_label(self, valve_position: float) -> None:
         valve_position_str: str = f'{valve_position:.2f}'
         self.actual_position_label.setText(valve_position_str)
-        #self.actual_position_label.update() # not sure if this is needed or not.
 
     def _get_pressure(self) -> float:
         pressure, (status_code, status_string) = self.tpg.pressure_gauge()
