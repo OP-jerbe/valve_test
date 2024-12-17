@@ -156,7 +156,7 @@ class App:
                 self.open_normalized_plot_window(self.valve_test_fig)
                 self.valve_test = None
         else:
-            print("There is already a valve test running.")
+            print("\nThere is already a valve test running.\n")
 
     def stop_test_button_handler(self) -> None:
         if self.valve_test and self.valve_test.running:
