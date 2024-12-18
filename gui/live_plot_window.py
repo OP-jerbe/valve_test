@@ -24,6 +24,7 @@ class LivePlotWindow(QDialog):
         # Set fixed axis limits and scaling
         self.ax.set_xlim(-0.5, 12.5)
         self.ax.set_ylim(1e-8, 1e-3)
+        self.ax.tick_params(axis='both', labelsize=8)
         self.ax.set_yscale('log')
 
         # Add canvas to the window
@@ -40,6 +41,7 @@ class LivePlotWindow(QDialog):
         # Reapply fixed axes settings
         self.ax.set_xlim(-0.5, 12.5)
         self.ax.set_ylim(1e-8, 1e-3)
+        self.ax.tick_params(axis='both', labelsize=8)
         self.ax.set_yscale('log')
 
         # Plot the data
@@ -49,5 +51,5 @@ class LivePlotWindow(QDialog):
         self.ax.set_title(f'VAT Valve #{self.serial_number}({self.rework_letter})')
         self.ax.set_xlabel("Leak Valve Turns")
         self.ax.set_ylabel("Pressure (mBar)")
-        self.ax.legend()
+        self.ax.legend(fontsize=5)
         self.canvas.draw()
