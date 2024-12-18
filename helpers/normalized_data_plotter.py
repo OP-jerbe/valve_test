@@ -41,11 +41,11 @@ class NormalizedPlot:
         self.ax.plot(self.x_down, self.normalized_y_down, label='Closing', color='lightskyblue', marker='o', markersize=2)
         self.ax.legend(fontsize=5)
         self.fig.tight_layout()
-        self.save_figure()
+        self.save_figure_remotely()
         #plt.show()
         return self.fig
     
-    def save_figure(self) -> None:
+    def save_figure_locally(self) -> None:
         date_time: str = datetime.now().strftime("%Y-%m-%d %H_%M")
         file_name: str = f'{date_time} {self.serial_number}{self.rework_letter} Normalized Pressure vs Turns.jpg'
         results_dir: Path = Path('results')
@@ -57,7 +57,22 @@ class NormalizedPlot:
             file_path: Path = folder_path / file_name
             self.fig.savefig(file_path)
         else:
-            print(f"Could not save figure. {folder_path} does not exist")
+            print(f"Could not save figure. {folder_path} does not exist.")
+
+    def save_figure_remotely(self) -> None:
+        date_time: str = datetime.now().strftime("%Y-%m-%d %H_%M")
+        file_name: str = f'{date_time} {self.serial_number}{self.rework_letter} Normalized Pressure vs Turns.jpg'
+        VAT_data_by_SN_dir: Path = Path(r'\\opdata2\Company\PRODUCTION FOLDER\VAT Leak Valve Test Data\VAT Data by SN')
+        valve_dir: str = f'{self.serial_number}'
+        folder_path: Path = VAT_data_by_SN_dir / valve_dir
+        try:
+            folder_path.mkdir(parents=True, exist_ok=True)
+        except:
+            print(f"Could not save figure to company drive. Attempting to save locally...")
+            self.save_figure_locally()
+        if folder_path.exists():
+            file_path: Path = folder_path / file_name
+            self.fig.savefig(file_path)
 
 
 def main() -> None:

@@ -160,9 +160,9 @@ class ValveTest:
             for row in zip(self.turns_up_log_copy, self.pressure_up_log_copy, self.turns_down_log_copy, self.pressure_down_log_copy):
                 writer.writerow(row)
 
-        print('CSV file written successfully!')
+        print(f'CSV file saved to {file_path}')
 
-    def save_csv(self) -> None:
+    def save_csv_locally(self) -> None:
         date_time: str = datetime.now().strftime("%Y-%m-%d %H_%M")
         file_name: str = f'{date_time} {self.serial_number}{self.rework_letter}.csv'
         results_dir: Path = Path('results')
@@ -174,7 +174,22 @@ class ValveTest:
             file_path: Path = folder_path / file_name
             self._create_csv(file_path)
         else:
-            print(f"Could not save figure. {folder_path} does not exist")
+            print(f"Could not save csv file. {folder_path} does not exist")
+
+    def save_csv_remotely(self) -> None:
+        date_time: str = datetime.now().strftime("%Y-%m-%d %H_%M")
+        file_name: str = f'{date_time} {self.serial_number}{self.rework_letter}.csv'
+        VAT_data_by_SN_dir: Path = Path(r'\\opdata2\Company\PRODUCTION FOLDER\VAT Leak Valve Test Data\VAT Data by SN')
+        valve_dir: str = f'{self.serial_number}'
+        folder_path: Path = VAT_data_by_SN_dir / valve_dir
+        try:
+            folder_path.mkdir(parents=True, exist_ok=True)
+        except:
+            print(f"Could not save csv file to company drive. Attempting to save locally...")
+            self.save_csv_locally()
+        if folder_path.exists():
+            file_path: Path = folder_path / file_name
+            self._create_csv(file_path)
 
     @staticmethod
     def _percent_change(starting_num: float, ending_num: float) -> float:
@@ -199,7 +214,7 @@ class ValveTest:
             self._check_if_valve_has_reached_turn_around_point()
             self._move_by_STEP_SIZE_and_wait_for_stability()
             self._check_if_valve_test_needs_to_stop()
-        self.save_csv()
+        self.save_csv_remotely()
         
     def stop(self) -> None:
         self.running = False
