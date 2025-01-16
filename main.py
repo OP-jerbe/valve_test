@@ -161,6 +161,7 @@ class App:
     def stop_test_button_handler(self) -> None:
         if self.valve_test and self.valve_test.running:
             self.valve_test.stop()
+            self.valve_test_fig = self.valve_test.plot_data()
             self.enable_gui()
             self.open_normalized_plot_window(self.valve_test_fig)
             self.valve_test = None
