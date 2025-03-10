@@ -6,18 +6,17 @@ class AGC100:
     Class to handle communication with the AGC-100 device.
     """
 
-    def __init__(self, device: str):
+    def __init__(self, port: str):
         """
         Initialize communication with AGC-100.
 
         Args:
-            device (str): Device name such as 'COM1' or '/dev/ttyUSB0'.
+            port (str): Device name such as 'COM1' or '/dev/ttyUSB0'.
         """
-        self.device = device
-        self.serial_conn = serial.Serial(port=device, baudrate=9600, timeout=1)
+        self.serial_conn = serial.Serial(port=port, baudrate=9600, timeout=1)
         self.serial_conn.write(b'\r\n')  # Equivalent to sending 'CR/LF' on initialization
 
-    def get_pressure(self) -> tuple[float, int]:
+    def pressure_gauge(self) -> tuple[float, int]:
         """
         Get pressure reading from AGC-100.
 
@@ -48,7 +47,7 @@ class AGC100:
         else:
             raise ValueError("Response in unexpected format!")
 
-    def close(self) -> None:
+    def close_port(self) -> None:
         """
         Terminate serial communication with AGC-100.
         """
