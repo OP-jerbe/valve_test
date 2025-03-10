@@ -8,7 +8,7 @@ class AGC100:
 
     def __init__(self, device: str):
         """
-        Initialize communication with AGC100.
+        Initialize communication with AGC-100.
 
         Args:
             device (str): Device name such as 'COM1' or '/dev/ttyUSB0'.
@@ -50,7 +50,7 @@ class AGC100:
 
     def close(self) -> None:
         """
-        Terminate serial communication with AGC100.
+        Terminate serial communication with AGC-100.
         """
         if self.serial_conn.is_open:
             self.serial_conn.close()
