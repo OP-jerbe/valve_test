@@ -8,5 +8,5 @@ def load_ini(ini_file: str) -> cp.ConfigParser:
 def find_comport(config_data: cp.ConfigParser, header: str) -> str:
     return config_data.get(header, 'com_port')
 
-def find_constant(config_data: cp.ConfigParser, header: str):
-     return config_data.get(header, f'{header}')
+def find_constant(config_data: cp.ConfigParser, header: str, selection: str) -> str:
+     return config_data.get(header, f'{selection}')
