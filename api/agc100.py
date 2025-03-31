@@ -1,5 +1,4 @@
 import serial
-import re
 
 MEASUREMENT_STATUS = {
     0: 'Measurement data okay',
@@ -18,24 +17,25 @@ class AGC100:
     """
 
     ETX = chr(3)  # \x03
-    CR = chr(13) #\r
-    LF = chr(10) #\n
+    CR = chr(13)  #\r
+    LF = chr(10)  #\n
     ENQ = chr(5)  # \x05
     ACK = chr(6)  # \x06
-    NAK = chr(21)  # \x15
+    NAK = chr(21) # \x15
 
-    def __init__(self, port: str):
+    def __init__(self, port: str='/dev/ttyUSB0', baudrate: int=9600):
         """
         Initialize communication with AGC-100.
 
         Args:
             port (str): Device name such as 'COM1' or '/dev/ttyUSB0'.
         """
-        self.serial = serial.Serial(port=port, baudrate=9600, timeout=1)
+        self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=1)
         self.serial.write(b'\r\n')  # Equivalent to sending 'CR/LF' on initialization
 
     def _cr_lf(self, string):
-        """Pad carriage return and line feed to a string
+        """
+        Pad carriage return and line feed to a string
 
         :param string: String to pad
         :type string: str
@@ -44,8 +44,9 @@ class AGC100:
         """
         return string + self.CR + self.LF # return '{string}\r\n'
 
-    def _send_command(self, command):
-        """Send a command and check if it is positively acknowledged
+    def _send_command(self, command) -> None:
+        """
+        Send a command and check if it is positively acknowledged
 
         :param command: The command to send
         :type command: str
@@ -62,8 +63,9 @@ class AGC100:
                 ''.format(repr(response))
             raise IOError(message)
 
-    def _get_data(self):
-        """Get the data that is ready on the device
+    def _get_data(self) -> str:
+        """
+        Get the data that is ready on the device
 
         :returns: the raw data
         :rtype:str
@@ -72,36 +74,36 @@ class AGC100:
         data = self.serial.readline().decode()
         return data.rstrip(self.LF).rstrip(self.CR)
 
-    def pressure_gauge(self) -> tuple[float, int]:
+    def pressure_gauge(self, gauge=1) -> tuple[float, tuple[int, str]]:
         """
-        Get pressure reading from AGC-100.
+        Return the pressure measured by gauge X
 
-        Returns:
-            tuple: (pressure value, status indicator)
+        :param gauge: The gauge number, 1 or 2
+        :type gauge: int
+        :raises ValueError: if gauge is not 1 or 2
+        :return: (value, (status_code, status_message))
+        :rtype: tuple
         """
-        if not self.serial.is_open:
-            raise ValueError("Serial port is not open!")
 
-        # Send 'PR1' command and read response
-        self.serial.write(b'PR1\r\n')
-        ret = self.serial.readline().decode().strip()
+        if gauge not in [1, 2]:
+            message = 'The input gauge number can only be 1 or 2'
+            raise ValueError(message)
+        self._send_command('PR' + str(gauge))
+        reply = self._get_data()
+        status_code = int(reply.split(',')[0])
+        value = float(reply.split(',')[1])
+        return value, (status_code, MEASUREMENT_STATUS[status_code])
 
-        # Check for positive acknowledgment (hex '6')
-        if ret and ret[0] == '6':
-            # Send 'CTRL-E' (hex 0x05) without termination and read with termination
-            self.serial.write(b'\x05')
-            ret = self.serial.readline().decode().strip()
-        else:
-            raise ValueError("Positive ACK not received!")
-
-        # Parse response
-        match = re.search(r'(\d), ([\deE+.-]+)', ret)
-        if match:
-            stat = int(match.group(1))
-            p = float(match.group(2))
-            return p, stat
-        else:
-            raise ValueError("Response in unexpected format!")
+    def open_port(self):
+        """Open the serial COM port
+        
+        :return: the status of the COM port
+        :rtype: str
+        """
+        if self.serial.is_open is not True:
+            self.serial.open()
+        com_status = "Serial port open"
+        return com_status
 
     def close_port(self) -> None:
         """
@@ -112,5 +114,5 @@ class AGC100:
 
 # Example usage:
 # agc = AGC100('COM1')
-# pressure, status = agc.get_pressure()
+# pressure, (status_code, MEASUREMENT_STATUS[status_code]) = agc.pressure_gauge()
 # agc.close()
