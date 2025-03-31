@@ -34,7 +34,7 @@ PRESSURE_UNITS = {0: 'mbar', 1: 'Torr', 2: 'Pascal'}
 
 
 class TPG26x(object):
-    r"""Abstract class that implements the common driver for the TPG 261 and
+    """Abstract class that implements the common driver for the TPG 261 and
     TPG 262 dual channel measurement and control unit. The driver implements
     the following 6 commands out the 39 in the specification:
 
