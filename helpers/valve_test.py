@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QLabel
 from helpers.normalized_data_plotter import NormalizedPlot
 from gui.live_plot_window import LivePlotWindow
 from api.pfeiffer_tpg26x import TPG261
+from api.agc100 import AGC100
 from api.motor import MotorController
 from helpers.constants import (
     MICROSTEPS_PER_REV, HOLD_TIME, AOI_LOWER_BOUND, AOI_UPPER_BOUND, PRESSURE_TURN_POINT, MOTOR_STEP_SIZE, DRIFT_TOLERANCE
@@ -14,10 +15,13 @@ from helpers.constants import (
 
 
 class ValveTest:
-    def __init__(self, motor: MotorController, pressure_gauge: TPG261, serial_number: str, rework_letter: str,
+    def __init__(self, motor: MotorController, pressure_gauge: TPG261 | AGC100, serial_number: str, rework_letter: str,
                  base_pressure: str, valve_position_label: QLabel, live_plot_window: LivePlotWindow) -> None:
         self.motor: MotorController = motor
-        self.tpg: TPG261 = pressure_gauge
+        if type(pressure_gauge) == TPG261:
+            self.gauge = pressure_gauge
+        elif type(pressure_gauge) == AGC100:
+            self.gauge = pressure_gauge
         self.serial_number: str = serial_number
         self.rework_letter: str = rework_letter
         self.base_pressure: str = base_pressure
@@ -39,9 +43,9 @@ class ValveTest:
         self.actual_position_label.setText(valve_position_str)
 
     def _get_pressure(self) -> float:
-        pressure, (status_code, status_string) = self.tpg.pressure_gauge()
+        pressure, (status_code, status_string) = self.gauge.pressure_gauge()
         if status_code != 0:
-            raise ValueError(f"Pressure gauge error: {status_string}")
+                raise ValueError(f"Pressure gauge error: {status_string}")
         return pressure
 
     def _get_motor_position(self) -> int:

@@ -3,17 +3,18 @@ import time
 from matplotlib.figure import Figure
 from api.motor import MotorController
 from api.pfeiffer_tpg26x import TPG261
+from api.agc100 import AGC100
 from gui.gui import QApplication, MainWindow
 from gui.live_plot_window import LivePlotWindow
 from gui.normalized_plot_window import NormalizedPlotWindow
 from helpers.constants import VERSION, MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
-from helpers.ini_reader import load_ini, find_comport
+from helpers.ini_reader import load_ini, find_comport, find_selection
 from helpers.valve_test import ValveTest
 from PySide6.QtCore import QTimer
 
 
 class App:
-    def __init__(self, motor_com_port: str, pressure_gauge_com_port: str) -> None:
+    def __init__(self, motor_com_port: str, pressure_gauge_com_port: str, pressure_gauge_controller: str) -> None:
         self.app = QApplication([])
         self.gui = MainWindow()
         self.gui.setWindowTitle(f'Automated Valve Test v{VERSION}')
@@ -25,7 +26,7 @@ class App:
             print(f"COULD NOT CONNECT TO MOTOR\nException: {e}")
             sys.exit()
         try:
-            self.pressure_gauge = TPG261(port=pressure_gauge_com_port)
+            self.pressure_gauge = self.connect_to_pressure_gauge_controller(pressure_gauge_com_port, pressure_gauge_controller)
             print("CONNECTED TO GAUGE\n")
         except Exception as e:
             self.pressure_gauge = None
@@ -110,6 +111,16 @@ class App:
 
         return motor
 
+    def connect_to_pressure_gauge_controller(self, com_port: str, controller: str) -> TPG261 | AGC100:
+        if controller == 'pfeiffer':
+            return TPG261(port=com_port)
+        elif controller == 'AGC100':
+            return AGC100(port=com_port)
+        else:
+            raise ValueError(f"Unsupported controller type: {controller}")
+        
+
+
     def home_button_handler(self) -> None:
         self.motor.home_motor()
         self.update_valve_position_until(valve_set_point=0)
@@ -189,7 +200,8 @@ def main() -> None:
     config_data = load_ini(ini_file)
     motor_com_port: str = find_comport(config_data, 'Motor')
     pressure_gauge_com_port: str = find_comport(config_data, 'Pressure_Gauge')
-    app: App = App(motor_com_port, pressure_gauge_com_port)
+    pressure_gauge_controller: str = find_selection(config_data, 'Pressure_Gauge', 'controller')
+    app: App = App(motor_com_port, pressure_gauge_com_port, pressure_gauge_controller)
     app.run()
     
 
