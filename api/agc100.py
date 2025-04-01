@@ -31,7 +31,6 @@ class AGC100:
             port (str): Device name such as 'COM1' or '/dev/ttyUSB0'.
         """
         self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=1)
-        self.serial.write(b'\r\n')  # Equivalent to sending 'CR/LF' on initialization
 
     def _cr_lf(self, string):
         """
@@ -53,7 +52,7 @@ class AGC100:
         :raises IOError: if the negative acknowledged or a unknown response
             is returned
         """
-        self.serial.write(bytes(self._cr_lf(command),'utf-8'))                 # serial.write(b'{command}\r\n')
+        self.serial.write(bytes(self._cr_lf(command),'utf-8'))                # serial.write(b'{command}\r\n')
         response = self.serial.readline().decode()
         if response == self._cr_lf(self.NAK):                                  # if response == '\x15\r\n'
             message = 'Serial communication returned negative acknowledge'
