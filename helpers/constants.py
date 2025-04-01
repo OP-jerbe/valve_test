@@ -1,12 +1,12 @@
 try:
-    from helpers.ini_reader import load_ini, find_constant
+    from helpers.ini_reader import load_ini, find_selection
 except:
-    from ini_reader import load_ini, find_constant
+    from ini_reader import load_ini, find_selection
 
 config_data = load_ini('valve_test.ini')
 
 
-VERSION: str = '1.0'
+VERSION: str = '1.1'
 
 # Motor control constants
 STEPS_PER_REV: int = 200 # Set by motor design. DO NOT CHANGE!!!
@@ -15,14 +15,32 @@ MICROSTEPS_PER_REV: int = STEPS_PER_REV * MICROSTEPS_PER_STEP
 MAX_VALVE_TURNS: int = 22
 
 # Valve test constants
-VALVE_STEP_SIZE: float = float(find_constant(config_data, 'VALVE_STEP_SIZE'))
+VALVE_STEP_SIZE: float = float(find_selection(config_data=config_data,
+                                              header='VALVE_STEP_SIZE',
+                                              selection='VALVE_STEP_SIZE'))
+
 MOTOR_STEP_SIZE: int = int(VALVE_STEP_SIZE * MICROSTEPS_PER_REV)
-HOLD_TIME: int = int(find_constant(config_data, 'HOLD_TIME')) # the number of seconds to wait for stability
-DRIFT_TOLERANCE: float = float(find_constant(config_data, 'DRIFT_TOLERANCE')) # the maximum percent change between pressure readings when checking for stability
+
+# The number of seconds to wait for stability
+HOLD_TIME: int = int(find_selection(config_data=config_data,
+                                    header='HOLD_TIME',
+                                    selection='HOLD_TIME'))
+
+# The maximum percent change between pressure readings when checking for stability
+DRIFT_TOLERANCE: float = float(find_selection(config_data=config_data,
+                                              header='DRIFT_TOLERANCE',
+                                              selection='DRIFT_TOLERANCE'))
 
 # Window that determines if program will wait for stability set by DRIFT_TOLERANCE
-AOI_LOWER_BOUND: float = float(find_constant(config_data, 'AOI_LOWER_BOUND')) # Pressure Area Of Interest Lower Bound
-AOI_UPPER_BOUND: float = float(find_constant(config_data, 'AOI_UPPER_BOUND')) # Pressure Area Of Interest Upper Bound
+AOI_LOWER_BOUND: float = float(find_selection(config_data=config_data,
+                                              header='AOI_LOWER_BOUND',
+                                              selection='AOI_LOWER_BOUND')) # Pressure Area Of Interest Lower Bound
+AOI_UPPER_BOUND: float = float(find_selection(config_data=config_data,
+                                              header='AOI_UPPER_BOUND',
+                                              selection='AOI_UPPER_BOUND')) # Pressure Area Of Interest Upper Bound
 
-PRESSURE_TURN_POINT: float = float(find_constant(config_data, 'PRESSURE_TURN_POINT')) # Pressure at which the valve should start closing
+# Pressure at which the valve should start closing
+PRESSURE_TURN_POINT: float = float(find_selection(config_data=config_data,
+                                                  header='PRESSURE_TURN_POINT',
+                                                  selection='PRESSURE_TURN_POINT'))
 
