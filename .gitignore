@@ -2,3 +2,4 @@ valve_test.ini
 __pycache__/
 /results
 project_tree.txt
+pyinstaller_command.txt
