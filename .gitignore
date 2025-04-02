@@ -1,5 +1,7 @@
 valve_test.ini
 __pycache__/
+/dist
+/build/main/
 /results
 project_tree.txt
 pyinstaller_command.txt
