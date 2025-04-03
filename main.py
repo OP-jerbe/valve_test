@@ -11,6 +11,7 @@ from gui.normalized_plot_window import NormalizedPlotWindow
 from helpers.constants import VERSION, MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
 from helpers.ini_reader import load_ini, find_comport, find_selection
 from helpers.valve_test import ValveTest
+from PySide6.QtCore import QTimer # do not delete
 
 
 class App:
