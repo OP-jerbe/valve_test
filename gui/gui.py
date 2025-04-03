@@ -27,10 +27,10 @@ class MainWindow(QMainWindow):
 
         self.setFixedSize(window_width,window_height)
         self.setWindowTitle('Automated Valve Test')
-        if hasattr(sys, 'frozen'):  # Check if running from the bundled app
-            icon_path = sys._MEIPASS + '/scan.ico'  # type: ignore
+        if hasattr(sys, 'frozen'):  # Check if running from the Pyinstaller EXE
+            icon_path = sys._MEIPASS + '/icon/valve_icon.ico'  # type: ignore
         else:
-            icon_path = 'icon/valve_icon.ico'  # Use the local icon file in dev mode
+            icon_path = './icon/valve_icon.ico'  # Use the local icon file in dev mode
         self.setWindowIcon(QIcon(icon_path))
         apply_stylesheet(self, theme='dark_lightgreen.xml', invert_secondary=True)
         self.setStyleSheet(self.styleSheet() + """QLineEdit, QTextEdit {color: lightgreen;}""")
