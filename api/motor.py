@@ -30,7 +30,7 @@ class MotorController:
         """Decode the raw response and extract the relevant part."""
         # Decode and clean up the raw response
         decoded_response: str = raw_response.decode(errors='ignore').strip()
-        print(f'{decoded_response = }')
+        #print(f'{decoded_response = }')
 
         # Define split characters to try
         split_chars: tuple[str, ...] = ('`', '@', '?', 'c', 'O', 'b')
@@ -57,13 +57,13 @@ class MotorController:
         :return: Response from the controller.
         """
         full_command = f"{self.start_character}{self.address}{command}{self.end_character}{self.carriage_return}"
-        print(f'{full_command = }')
+        #print(f'{full_command = }')
         self.serial.write(full_command.encode())
         self.pause(0.1)  # Give the controller some time to respond
         raw_response: bytes = self.serial.readline()
-        print(f'{raw_response = }')
+        #print(f'{raw_response = }')
         text: str = self._decode_response(raw_response)
-        print(f'{text = }\n')
+        #print(f'{text = }\n')
         return text
 
     def set_current(self, running_current, holding_current) -> None:
@@ -73,9 +73,9 @@ class MotorController:
         :param running_current: Running current percentage (0-100).
         :param holding_current: Holding current percentage (0-50).
         """
-        print("Running Current Command".upper())
+        #print("Running Current Command".upper())
         self.send_command(f"m{running_current}")
-        print("Holding Current Command".upper())
+        #print("Holding Current Command".upper())
         self.send_command(f"h{holding_current}")
 
     def set_velocity_and_acceleration(self, velocity, acceleration) -> None:
@@ -85,9 +85,9 @@ class MotorController:
         :param velocity: Maximum speed in microsteps per second.
         :param acceleration: Acceleration in µsteps/sec².
         """
-        print("Velocity Command".upper())
+        #print("Velocity Command".upper())
         self.send_command(f"V{velocity}")
-        print("Acceleration Command".upper())
+        #print("Acceleration Command".upper())
         self.send_command(f"L{acceleration}")
 
     def move_absolute(self, position) -> None:
@@ -96,7 +96,7 @@ class MotorController:
         
         :param position: Absolute position in steps.
         """
-        print("Absolute Movement Command".upper())
+        #print("Absolute Movement Command".upper())
         self.send_command(f"A{position}")
 
     def move_relative(self, steps) -> None:
@@ -105,7 +105,7 @@ class MotorController:
         
         :param steps: Steps to move (positive for forward, negative for backward).
         """
-        print("Relative Movement Command".upper())
+        #print("Relative Movement Command".upper())
         if steps >= 0:
             self.send_command(f"P{steps}")
         else:
@@ -115,7 +115,7 @@ class MotorController:
         """
         Command the motor to go to its zero position
         """
-        print("Home Command".upper())
+        #print("Home Command".upper())
         self.send_command("A0")
 
     def query_position(self) -> str:
@@ -124,14 +124,14 @@ class MotorController:
         
         :return: Motor position.
         """
-        print("Query Position Command".upper())
+        #print("Query Position Command".upper())
         return self.send_command("?0")
     
     def set_zero(self) -> None:
         """
         Set the current position to zero without moving the motor.
         """
-        print("Set Zero Command".upper())
+        #print("Set Zero Command".upper())
         self.send_command('z')
 
     def set_rotation_direction(self, direction: str='normal') -> None:
@@ -140,7 +140,7 @@ class MotorController:
 
         :param direction: Motor operation direction ('normal' for ccw open, 'reverse' for cw to open.)
         """
-        print("Rotation Direction Command".upper())
+        #print("Rotation Direction Command".upper())
         if direction == 'normal':
             self.send_command("F0")
         elif direction == 'reverse':
@@ -167,22 +167,24 @@ class MotorController:
 
         :return: microsteps per step setting
         """
-        print("Query Microstep per Step Command".upper())
+        #print("Query Microstep per Step Command".upper())
         return self.send_command("?6")
 
     def stop(self) -> None:
         """
         Stop the current motor operation.
         """
-        print("Stop Command".upper())
+        #print("Stop Command".upper())
         self.send_command("T")
 
     def close_port(self) -> None:
         """
         Close the serial connection.
         """
-        print("Close Port Command".upper())
+        #print("Close Port Command".upper())
         self.serial.close()
+        if self.serial.is_open is not True:
+            print("Motor serial port closed.")
 
 # Example usage in main.py:
 if __name__ == "__main__":
