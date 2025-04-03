@@ -10,10 +10,9 @@ VERSION: str = '1.1'
 
 def get_ini_path() -> str:
     if hasattr(sys, 'frozen'):  # Check if running as a PyInstaller EXE
-        print(f'Path to ini file: {sys._MEIPASS + '/valve_test.ini'}') # type:ignore
-        return sys._MEIPASS + '/configuration/valve_test.ini' # type:ignore
+        return sys._MEIPASS + '/valve_test.ini' # type:ignore
     else:
-        return './configuration/valve_test.ini'  # Running as a script
+        return 'valve_test.ini'  # Running as a script
 
 
 ini_path: str = get_ini_path()
@@ -64,5 +63,5 @@ if __name__ == '__main__':
         print(f'{AOI_LOWER_BOUND = }')
         print(f'{AOI_UPPER_BOUND = }')
         print(f'{PRESSURE_TURN_POINT = }')
-        
+
     print_all_ini_constants()
