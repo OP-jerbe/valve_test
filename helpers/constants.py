@@ -22,8 +22,6 @@ VALVE_STEP_SIZE: float = float(find_selection(config_data=config_data,
                                               header='VALVE_STEP_SIZE',
                                               selection='VALVE_STEP_SIZE'))
 
-print(f'{VALVE_STEP_SIZE = }\n')
-
 MOTOR_STEP_SIZE: int = int(VALVE_STEP_SIZE * MICROSTEPS_PER_REV)
 
 # The number of seconds to wait for stability
