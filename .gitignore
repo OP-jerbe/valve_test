@@ -1,7 +1,7 @@
-valve_test.ini
 __pycache__/
 /dist
 /build/main/
 /results
+/configuration/valve_test.ini
 project_tree.txt
 pyinstaller_command.txt
