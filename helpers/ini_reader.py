@@ -1,4 +1,11 @@
 import configparser as cp
+import sys
+
+def get_ini_filepath() -> str:
+     if hasattr(sys, 'frozen'):  # Check if running as a PyInstaller EXE
+          return sys._MEIPASS + '/configuration/valve_test.ini' # type:ignore
+     else:
+          return './configuration/valve_test.ini'  # Running as a script
 
 def load_ini(ini_file: str) -> cp.ConfigParser:
      config_data = cp.ConfigParser()

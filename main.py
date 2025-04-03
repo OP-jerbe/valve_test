@@ -9,7 +9,7 @@ from gui.gui import QApplication, MainWindow
 from gui.live_plot_window import LivePlotWindow
 from gui.normalized_plot_window import NormalizedPlotWindow
 from helpers.constants import VERSION, MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
-from helpers.ini_reader import load_ini, find_comport, find_selection
+from helpers.ini_reader import load_ini, find_comport, find_selection, get_ini_filepath
 from helpers.valve_test import ValveTest
 from PySide6.QtCore import QTimer # do not delete
 
@@ -196,8 +196,8 @@ class App:
 
 
 def main() -> None:
-    ini_file: str = 'valve_test.ini'
-    config_data = load_ini(ini_file)
+    ini_filepath: str = get_ini_filepath()
+    config_data = load_ini(ini_filepath)
     motor_com_port: str = find_comport(config_data, 'Motor')
     pressure_gauge_com_port: str = find_comport(config_data, 'Pressure_Gauge')
     pressure_gauge_controller: str = find_selection(config_data, 'Pressure_Gauge', 'controller')

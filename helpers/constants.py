@@ -1,21 +1,13 @@
 import sys
 try:
-    from helpers.ini_reader import load_ini, find_selection
+    from helpers.ini_reader import load_ini, find_selection, get_ini_filepath
 except:
-    from ini_reader import load_ini, find_selection
+    from ini_reader import load_ini, find_selection, get_ini_filepath
 
 
 VERSION: str = '1.1'
 
-
-def get_ini_path() -> str:
-    if hasattr(sys, 'frozen'):  # Check if running as a PyInstaller EXE
-        return sys._MEIPASS + '/valve_test.ini' # type:ignore
-    else:
-        return 'valve_test.ini'  # Running as a script
-
-
-ini_path: str = get_ini_path()
+ini_path: str = get_ini_filepath()
 
 config_data = load_ini(ini_path)
 
@@ -29,6 +21,8 @@ MAX_VALVE_TURNS: int = 22
 VALVE_STEP_SIZE: float = float(find_selection(config_data=config_data,
                                               header='VALVE_STEP_SIZE',
                                               selection='VALVE_STEP_SIZE'))
+
+print(f'{VALVE_STEP_SIZE = }\n')
 
 MOTOR_STEP_SIZE: int = int(VALVE_STEP_SIZE * MICROSTEPS_PER_REV)
 
