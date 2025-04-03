@@ -1,5 +1,6 @@
 import sys
 import time
+import traceback
 from matplotlib.figure import Figure
 from api.motor import MotorController
 from api.pfeiffer_tpg26x import TPG261
@@ -24,7 +25,6 @@ class App:
             print("CONNECTED TO MOTOR")
         except Exception as e:
             print(f"COULD NOT CONNECT TO MOTOR\nException: {e}")
-            sys.exit()
         try:
             self.pressure_gauge = self.connect_to_pressure_gauge_controller(pressure_gauge_com_port, pressure_gauge_controller)
             print("CONNECTED TO GAUGE\n")
@@ -206,5 +206,10 @@ def main() -> None:
     
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        full_traceback = traceback.format_exc()
+        print(f'Error: {e}\n{full_traceback}\n')
+        sys.exit()
 
