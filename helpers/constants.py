@@ -1,12 +1,24 @@
+import sys
 try:
     from helpers.ini_reader import load_ini, find_selection
 except:
     from ini_reader import load_ini, find_selection
 
-config_data = load_ini('valve_test.ini')
-
 
 VERSION: str = '1.1'
+
+
+def get_ini_path() -> str:
+    if hasattr(sys, 'frozen'):  # Check if running as a PyInstaller EXE
+        print(f'Path to ini file: {sys._MEIPASS + '/valve_test.ini'}') # type:ignore
+        return sys._MEIPASS + '/configuration/valve_test.ini' # type:ignore
+    else:
+        return './configuration/valve_test.ini'  # Running as a script
+
+
+ini_path: str = get_ini_path()
+
+config_data = load_ini(ini_path)
 
 # Motor control constants
 STEPS_PER_REV: int = 200 # Set by motor design. DO NOT CHANGE!!!
@@ -44,3 +56,13 @@ PRESSURE_TURN_POINT: float = float(find_selection(config_data=config_data,
                                                   header='PRESSURE_TURN_POINT',
                                                   selection='PRESSURE_TURN_POINT'))
 
+if __name__ == '__main__':
+    def print_all_ini_constants():
+        print(f'{VALVE_STEP_SIZE = }')
+        print(f'{HOLD_TIME = }')
+        print(f'{DRIFT_TOLERANCE = }')
+        print(f'{AOI_LOWER_BOUND = }')
+        print(f'{AOI_UPPER_BOUND = }')
+        print(f'{PRESSURE_TURN_POINT = }')
+        
+    print_all_ini_constants()
