@@ -1,6 +1,6 @@
 import serial
 
-MEASUREMENT_STATUS = {
+MEASUREMENT_STATUS: dict = {
     0: 'Measurement data okay',
     1: 'Underrange',
     2: 'Overrange',
@@ -16,12 +16,12 @@ class AGC100:
     Class to handle communication with the AGC-100 device.
     """
 
-    ETX = chr(3)  # \x03
-    CR = chr(13)  #\r
-    LF = chr(10)  #\n
-    ENQ = chr(5)  # \x05
-    ACK = chr(6)  # \x06
-    NAK = chr(21) # \x15
+    ETX: str = chr(3)  # \x03
+    CR: str = chr(13)  #\r
+    LF: str = chr(10)  #\n
+    ENQ: str = chr(5)  # \x05
+    ACK: str = chr(6)  # \x06
+    NAK: str = chr(21) # \x15
 
     def __init__(self, port: str='/dev/ttyUSB0', baudrate: int=9600) -> None:
         """
@@ -43,7 +43,7 @@ class AGC100:
         """
         return string + self.CR + self.LF # return '{string}\r\n'
 
-    def _send_command(self, command) -> None:
+    def _send_command(self, command: str) -> None:
         """
         Send a command and check if it is positively acknowledged
 
@@ -53,7 +53,7 @@ class AGC100:
             is returned
         """
         self.serial.write(bytes(self._cr_lf(command),'utf-8'))                # serial.write(b'{command}\r\n')
-        response = self.serial.readline().decode()
+        response: str = self.serial.readline().decode()
         if response == self._cr_lf(self.NAK):                                  # if response == '\x15\r\n'
             message = 'Serial communication returned negative acknowledge'
             raise IOError(message)
@@ -70,7 +70,7 @@ class AGC100:
         :rtype:str
         """
         self.serial.write(bytes(self.ENQ,'utf-8')) # serial.write(b'\x05')
-        data = self.serial.readline().decode()
+        data: str = self.serial.readline().decode()
         return data.rstrip(self.LF).rstrip(self.CR)
 
     def pressure_gauge(self, gauge=1) -> tuple[float, tuple[int, str]]:
