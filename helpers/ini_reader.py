@@ -1,4 +1,4 @@
-import configparser as cp
+from configparser import ConfigParser
 import sys
 
 def get_ini_filepath() -> str:
@@ -7,13 +7,13 @@ def get_ini_filepath() -> str:
      else:
           return './configuration/valve_test.ini'  # Running as a script
 
-def load_ini(ini_file: str) -> cp.ConfigParser:
-     config_data = cp.ConfigParser()
+def load_ini(ini_file: str) -> ConfigParser:
+     config_data = ConfigParser()
      config_data.read(ini_file)
      return config_data
 
-def find_comport(config_data: cp.ConfigParser, header: str) -> str:
+def find_comport(config_data: ConfigParser, header: str) -> str:
     return config_data.get(header, 'com_port')
 
-def find_selection(config_data: cp.ConfigParser, header: str, selection: str) -> str:
+def find_selection(config_data: ConfigParser, header: str, selection: str) -> str:
      return config_data.get(header, f'{selection}')

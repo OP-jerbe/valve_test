@@ -1,4 +1,4 @@
-import sys
+from configparser import ConfigParser
 try:
     from helpers.ini_reader import load_ini, find_selection, get_ini_filepath
 except:
@@ -9,7 +9,7 @@ VERSION: str = '1.1'
 
 ini_path: str = get_ini_filepath()
 
-config_data = load_ini(ini_path)
+config_data: ConfigParser = load_ini(ini_path)
 
 # Motor control constants
 STEPS_PER_REV: int = 200 # Set by motor design. DO NOT CHANGE!!!
