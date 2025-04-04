@@ -23,7 +23,7 @@ class AGC100:
     ACK = chr(6)  # \x06
     NAK = chr(21) # \x15
 
-    def __init__(self, port: str='/dev/ttyUSB0', baudrate: int=9600):
+    def __init__(self, port: str='/dev/ttyUSB0', baudrate: int=9600) -> None:
         """
         Initialize communication with AGC-100.
 
@@ -32,7 +32,7 @@ class AGC100:
         """
         self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=1)
 
-    def _cr_lf(self, string):
+    def _cr_lf(self, string: str) -> str:
         """
         Pad carriage return and line feed to a string
 
@@ -93,25 +93,16 @@ class AGC100:
         value = float(reply.split(',')[1])
         return value, (status_code, MEASUREMENT_STATUS[status_code])
 
-    def open_port(self):
-        """Open the serial COM port
-        
-        :return: the status of the COM port
-        :rtype: str
-        """
-        if self.serial.is_open is not True:
-            self.serial.open()
-        com_status = "Serial port open"
-        return com_status
-
     def close_port(self) -> None:
         """
         Terminate serial communication with AGC-100.
         """
-        if self.serial.is_open:
-            self.serial.close()
+        self.serial.close()
+        if self.serial.is_open is not True:
+            print('Pressure gauge serial port closed.')
+
 
 # Example usage:
 # agc = AGC100('COM1')
 # pressure, (status_code, MEASUREMENT_STATUS[status_code]) = agc.pressure_gauge()
-# agc.close()
+# agc.close_port()
