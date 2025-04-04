@@ -5,7 +5,7 @@ except:
     from ini_reader import load_ini, find_selection, get_ini_filepath
 
 
-VERSION: str = '1.1'
+VERSION: str = '1.0'
 
 ini_path: str = get_ini_filepath()
 
