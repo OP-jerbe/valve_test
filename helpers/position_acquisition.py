@@ -1,13 +1,15 @@
-import traceback
 import threading
 import time
+import traceback
+
 from api.motor import MotorController
-from PySide6.QtCore import Signal
 from helpers.constants import MICROSTEPS_PER_REV
 
 
-class PositionAcquisition():
-    def __init__(self, motor: MotorController, update_callback, interval: float | int = 1) -> None:
+class PositionAcquisition:
+    def __init__(
+        self, motor: MotorController, update_callback, interval: float | int = 1
+    ) -> None:
         super().__init__()
         self.motor: MotorController = motor
         self.update_callback = update_callback
@@ -27,7 +29,7 @@ class PositionAcquisition():
             print("Started threading.\n")
 
     def stop(self) -> None:
-        """ 
+        """
         Stop the position acquisition process
         """
         self.running = False
@@ -49,11 +51,11 @@ class PositionAcquisition():
         """
         if not self.motor:
             return
-        
+
         try:
             motor_position: str = self.motor.query_position()
             valve_position: float = int(motor_position) / MICROSTEPS_PER_REV
             self.update_callback(valve_position)
         except Exception as e:
             traceback.print_exc()
-            print(f'\nError while fetching data: {e}\n')
+            print(f"\nError while fetching data: {e}\n")

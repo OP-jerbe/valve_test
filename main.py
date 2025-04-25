@@ -1,24 +1,35 @@
 import sys
 import time
 import traceback
+
 from matplotlib.figure import Figure
+
+from api.agc100 import AGC100
 from api.motor import MotorController
 from api.pfeiffer_tpg26x import TPG261
-from api.agc100 import AGC100
-from gui.gui import QApplication, MainWindow
+from gui.gui import MainWindow, QApplication
 from gui.live_plot_window import LivePlotWindow
 from gui.normalized_plot_window import NormalizedPlotWindow
-from helpers.constants import VERSION, MICROSTEPS_PER_STEP, MICROSTEPS_PER_REV, MAX_VALVE_TURNS
-from helpers.ini_reader import load_ini, find_comport, find_selection, get_ini_filepath
+from helpers.constants import (
+    MAX_VALVE_TURNS,
+    MICROSTEPS_PER_REV,
+    MICROSTEPS_PER_STEP,
+    VERSION,
+)
+from helpers.ini_reader import find_comport, find_selection, get_ini_filepath, load_ini
 from helpers.valve_test import ValveTest
-from PySide6.QtCore import QTimer # do not delete
 
 
 class App:
-    def __init__(self, motor_com_port: str, pressure_gauge_com_port: str, pressure_gauge_controller: str) -> None:
+    def __init__(
+        self,
+        motor_com_port: str,
+        pressure_gauge_com_port: str,
+        pressure_gauge_controller: str,
+    ) -> None:
         self.app = QApplication([])
         self.gui = MainWindow()
-        self.gui.setWindowTitle(f'Automated Valve Test v{VERSION}')
+        self.gui.setWindowTitle(f"Automated Valve Test v{VERSION}")
 
         try:
             self.motor: MotorController = self.connect_to_motor(motor_com_port)
@@ -26,16 +37,17 @@ class App:
         except Exception as e:
             print(f"COULD NOT CONNECT TO MOTOR\nException: {e}")
         try:
-            self.pressure_gauge = self.connect_to_pressure_gauge_controller(pressure_gauge_com_port, pressure_gauge_controller)
+            self.pressure_gauge = self.connect_to_pressure_gauge_controller(
+                pressure_gauge_com_port, pressure_gauge_controller
+            )
             print("CONNECTED TO GAUGE\n")
         except Exception as e:
             self.pressure_gauge = None
             print(f"COULD NOT CONNECT TO PRESSURE GAUGE\nException: {e}\n")
-        
+
         initial_motor_position: int = int(self.motor.query_position())
         initial_valve_position: float = initial_motor_position / MICROSTEPS_PER_REV
-        self.gui.actual_position_reading.setText(f'{initial_valve_position:.2f}')
-
+        self.gui.actual_position_reading.setText(f"{initial_valve_position:.2f}")
 
         self.gui.open_button.pressed.connect(self.open_button_pressed_handler)
         self.gui.open_button.released.connect(self.open_button_released_handler)
@@ -43,8 +55,12 @@ class App:
         self.gui.close_button.released.connect(self.close_button_released_handler)
         self.gui.home_button.clicked.connect(self.home_button_handler)
         self.gui.set_zero_button.clicked.connect(self.set_zero_button_handler)
-        self.gui.go_to_position_button.clicked.connect(self.go_to_position_button_handler)
-        self.gui.go_to_position_input.returnPressed.connect(self.go_to_position_button_handler)
+        self.gui.go_to_position_button.clicked.connect(
+            self.go_to_position_button_handler
+        )
+        self.gui.go_to_position_input.returnPressed.connect(
+            self.go_to_position_button_handler
+        )
         self.gui.start_test_button.pressed.connect(self.start_test_button_handler)
         self.gui.stop_test_button.pressed.connect(self.stop_test_button_handler)
 
@@ -81,9 +97,9 @@ class App:
 
     def _set_position_text(self) -> None:
         motor_position: str = self.motor.query_position()
-        if motor_position != '':
+        if motor_position != "":
             valve_position: float = int(motor_position) / MICROSTEPS_PER_REV
-            self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
+            self.gui.actual_position_reading.setText(f"{valve_position:.2f}")
 
     def update_valve_position_until(self, valve_set_point: float) -> None:
         motor_stop_point: int = int(valve_set_point * MICROSTEPS_PER_REV)
@@ -93,7 +109,7 @@ class App:
             time.sleep(0.25)
             motor_position: int = int(self.motor.query_position())
             valve_position: float = motor_position / MICROSTEPS_PER_REV
-        self.gui.actual_position_reading.setText(f'{valve_position:.2f}')
+        self.gui.actual_position_reading.setText(f"{valve_position:.2f}")
 
     def connect_to_motor(self, com_port: str) -> MotorController:
         microstep: int = MICROSTEPS_PER_STEP
@@ -101,7 +117,7 @@ class App:
         holding_current: int = 2
         velocity: int = 300
         acceleration: int = 50
-        rotation_direction: str = 'normal'
+        rotation_direction: str = "normal"
 
         motor: MotorController = MotorController(port=com_port)
         motor.set_microsteps_per_step(microstep)
@@ -111,23 +127,23 @@ class App:
 
         return motor
 
-    def connect_to_pressure_gauge_controller(self, com_port: str, controller: str) -> TPG261 | AGC100:
-        if controller == 'pfeiffer':
+    def connect_to_pressure_gauge_controller(
+        self, com_port: str, controller: str
+    ) -> TPG261 | AGC100:
+        if controller == "pfeiffer":
             return TPG261(port=com_port)
-        elif controller == 'AGC100':
+        elif controller == "AGC100":
             return AGC100(port=com_port)
         else:
             raise ValueError(f"Unsupported controller type: {controller}")
-        
-
 
     def home_button_handler(self) -> None:
         self.motor.home_motor()
         self.update_valve_position_until(valve_set_point=0)
-    
+
     def set_zero_button_handler(self) -> None:
         self.motor.set_zero()
-        self.gui.actual_position_reading.setText('0.00')
+        self.gui.actual_position_reading.setText("0.00")
 
     def open_button_pressed_handler(self) -> None:
         self.motor.move_relative(MAX_VALVE_TURNS * MICROSTEPS_PER_REV)
@@ -137,14 +153,14 @@ class App:
         self._set_position_text()
 
     def close_button_pressed_handler(self) -> None:
-        self.motor.home_motor() # close until zero is reached
+        self.motor.home_motor()  # close until zero is reached
 
     def close_button_released_handler(self) -> None:
         self.motor.stop()
         self._set_position_text()
 
     def go_to_position_button_handler(self) -> None:
-        if self.gui.go_to_position_input.text() != '':
+        if self.gui.go_to_position_input.text() != "":
             target_valve_position: float = float(self.gui.go_to_position_input.text())
             command_position: int = int(target_valve_position * MICROSTEPS_PER_REV)
             self.gui.go_to_position_input.clear()
@@ -152,14 +168,24 @@ class App:
             self.update_valve_position_until(valve_set_point=target_valve_position)
 
     def start_test_button_handler(self) -> None:
-        if not self.valve_test: # if there is not a valve test running
+        if not self.valve_test:  # if there is not a valve test running
             self.gui.start_test_button.clearFocus()
             serial_number = self.gui.serial_number_input.text()
             rework_letter = self.gui.rework_letter_input.text()
             base_pressure = self.gui.base_pressure_input.text()
             if self.pressure_gauge:
-                self.live_plot_window: LivePlotWindow = LivePlotWindow(serial_number, rework_letter, base_pressure, parent=self.gui)
-                self.valve_test = ValveTest(self.motor, self.pressure_gauge, serial_number, rework_letter, base_pressure, self.gui.actual_position_reading, self.live_plot_window)
+                self.live_plot_window: LivePlotWindow = LivePlotWindow(
+                    serial_number, rework_letter, base_pressure, parent=self.gui
+                )
+                self.valve_test = ValveTest(
+                    self.motor,
+                    self.pressure_gauge,
+                    serial_number,
+                    rework_letter,
+                    base_pressure,
+                    self.gui.actual_position_reading,
+                    self.live_plot_window,
+                )
                 self.disable_gui()
                 self.valve_test.run()
                 self.enable_gui()
@@ -188,7 +214,7 @@ class App:
         if self.valve_test and self.valve_test.running:
             self.valve_test.stop()
         time.sleep(0.25)
-    
+
     def run(self) -> None:
         self.app.aboutToQuit.connect(self.cleanup)
         exit_code: int = self.app.exec()
@@ -198,18 +224,19 @@ class App:
 def main() -> None:
     ini_filepath: str = get_ini_filepath()
     config_data = load_ini(ini_filepath)
-    motor_com_port: str = find_comport(config_data, 'Motor')
-    pressure_gauge_com_port: str = find_comport(config_data, 'Pressure_Gauge')
-    pressure_gauge_controller: str = find_selection(config_data, 'Pressure_Gauge', 'controller')
+    motor_com_port: str = find_comport(config_data, "Motor")
+    pressure_gauge_com_port: str = find_comport(config_data, "Pressure_Gauge")
+    pressure_gauge_controller: str = find_selection(
+        config_data, "Pressure_Gauge", "controller"
+    )
     app: App = App(motor_com_port, pressure_gauge_com_port, pressure_gauge_controller)
     app.run()
-    
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
         main()
     except Exception as e:
         full_traceback = traceback.format_exc()
-        print(f'Error: {e}\n{full_traceback}\n')
+        print(f"Error: {e}\n{full_traceback}\n")
         sys.exit()
-
