@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('icon', 'icon'), ('api', 'api'), ('gui', 'gui'), ('helpers', 'helpers'), ('configuration', 'configuration')],
+    datas=[('icon/valve_icon.ico', 'icon'), ('api', 'api'), ('gui', 'gui'), ('helpers', 'helpers'), ('configuration', 'configuration')],
     hiddenimports=['serial', 'qt_material'],
     hookspath=[],
     hooksconfig={},
