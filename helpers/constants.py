@@ -6,7 +6,7 @@ except Exception:
     from ini_reader import find_selection, get_ini_filepath, load_ini
 
 
-VERSION: str = "1.1"
+VERSION: str = "1.1.2"
 
 ini_path: str = get_ini_filepath()
 

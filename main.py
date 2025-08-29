@@ -7,6 +7,11 @@ from matplotlib.figure import Figure
 from api.agc100 import AGC100
 from api.motor import MotorController
 from api.pfeiffer_tpg26x import TPG261
+from gui.error_messages import (
+    failed_to_connect_to_motor,
+    failed_to_connect_to_pressure_gauge,
+    failed_to_start_message,
+)
 from gui.gui import MainWindow, QApplication
 from gui.live_plot_window import LivePlotWindow
 from gui.normalized_plot_window import NormalizedPlotWindow
@@ -36,6 +41,8 @@ class App:
             print("CONNECTED TO MOTOR")
         except Exception as e:
             print(f"COULD NOT CONNECT TO MOTOR\nException: {e}")
+            full_traceback = traceback.format_exc()
+            failed_to_connect_to_motor(self.gui, e, full_traceback)
         try:
             self.pressure_gauge = self.connect_to_pressure_gauge_controller(
                 pressure_gauge_com_port, pressure_gauge_controller
@@ -44,6 +51,8 @@ class App:
         except Exception as e:
             self.pressure_gauge = None
             print(f"COULD NOT CONNECT TO PRESSURE GAUGE\nException: {e}\n")
+            full_traceback = traceback.format_exc()
+            failed_to_connect_to_pressure_gauge(self.gui, e, full_traceback)
 
         initial_motor_position: int = int(self.motor.query_position())
         initial_valve_position: float = initial_motor_position / MICROSTEPS_PER_REV
@@ -239,4 +248,5 @@ if __name__ == "__main__":
     except Exception as e:
         full_traceback = traceback.format_exc()
         print(f"Error: {e}\n{full_traceback}\n")
+        failed_to_start_message(None, e, full_traceback)
         sys.exit()
